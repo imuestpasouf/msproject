@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-black: #0a0a0a;
+  --color-white: #fafafa;
+  --color-off: #f4f2ef;
+  --color-gl: #e8e6e2;
+  --color-gm: #9a9590;
+  --color-gd: #3a3733;
+  --color-rg: #c9956c;
+  --color-rgl: #e8c4a8;
+
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-body: var(--font-jost), system-ui, sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background: var(--color-white);
+  color: var(--color-black);
+  overflow-x: hidden;
+}
+
+/* --- Keyframe animations --- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heroZoom {
+  from { transform: scale(1.04); }
+  to   { transform: scale(1); }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 1; }
+}
+
+/* --- Utility animation classes (not easily expressible as Tailwind utilities) --- */
+.anim-hero-bg {
+  animation: heroZoom 8s ease-out forwards;
+}
+
+.anim-fade-up {
+  animation: fadeUp 1.2s ease 0.3s both;
+}
+
+.anim-fade-up-late {
+  animation: fadeUp 1.2s ease 0.9s both;
+}
+
+.anim-scroll-pulse {
+  animation: scrollPulse 2s ease infinite;
+}
+
+/* --- Scrollbar hiding for brand strip --- */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
