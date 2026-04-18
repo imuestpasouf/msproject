@@ -3,7 +3,7 @@ import { Cormorant_Garamond, Jost } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import Link from 'next/link'
+import MarqueeBanner from '@/components/ui/MarqueeBanner'
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -35,12 +35,17 @@ export default function RootLayout({
       className={`${cormorant.variable} ${jost.variable}`}
     >
       <body className="min-h-screen flex flex-col">
-        <Navbar />
+        {/* Single fixed header — Navbar + MarqueeBanner stack naturally,
+            no hardcoded pixel offsets between them */}
+        <header className="fixed top-0 left-0 right-0 z-[100]">
+          <Navbar />
+          <MarqueeBanner />
+        </header>
         <main className="flex-1">{children}</main>
         <Footer />
 
-        {/* WhatsApp float */}
-        <Link
+        {/* WhatsApp float — external URL, <a> not <Link> */}
+        <a
           href="https://wa.me/212600000000"
           target="_blank"
           rel="noopener noreferrer"
@@ -52,7 +57,7 @@ export default function RootLayout({
           aria-label="Contacter sur WhatsApp"
         >
           💬
-        </Link>
+        </a>
       </body>
     </html>
   )

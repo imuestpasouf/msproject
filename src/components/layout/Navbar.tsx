@@ -9,7 +9,7 @@ export default function Navbar() {
   return (
     <>
       {/* Desktop nav */}
-      <nav className="fixed top-0 left-0 right-0 z-[100] flex items-center justify-between px-12 py-[18px] bg-white/[0.94] backdrop-blur-[12px] border-b border-gl"
+      <nav className="flex items-center justify-between px-12 py-[18px] backdrop-blur-[12px] border-b border-gl max-md:px-5"
            style={{ background: 'rgba(250,250,250,0.94)' }}>
         <Link href="/" className="font-display text-[1.4rem] font-semibold tracking-[0.12em] text-black no-underline">
           D<span className="text-rg">1</span> MILANO
