@@ -583,8 +583,6 @@ export default function AdminSitePage() {
         onUpload={handleUpload}
       />
       <BrandStrip />
-      <CollectionsSection products={MOCK_PRODUCTS} />
-      <HomeCatalogueSection products={MOCK_PRODUCTS} />
       <LifestyleSection
         images={images}
         uploading={uploading}

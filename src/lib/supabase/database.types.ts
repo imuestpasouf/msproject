@@ -61,6 +61,7 @@ export interface Order {
   paiement_ref: string | null
   suivi_numero: string | null
   suivi_lien: string | null
+  service_livraison: string | null
   notes_commercial: string | null
   traite_le: string | null
   expedie_le: string | null

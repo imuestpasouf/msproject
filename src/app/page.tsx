@@ -11,11 +11,11 @@ type SiteImageKey = 'hero' | 'life1' | 'life2' | 'life3' | 'life4'
 type SiteImages = Record<SiteImageKey, string>
 
 const PLACEHOLDERS: SiteImages = {
-  hero: '',
-  life1: '',
-  life2: '',
-  life3: '',
-  life4: '',
+  hero: '/placeholders/hero.jpg',
+  life1: '/placeholders/lifestyle.jpg',
+  life2: '/placeholders/lifestyle.jpg',
+  life3: '/placeholders/lifestyle.jpg',
+  life4: '/placeholders/lifestyle.jpg',
 }
 
 async function getSiteImages(): Promise<SiteImages> {
@@ -50,10 +50,6 @@ async function getProducts(): Promise<Product[]> {
 // ─── Section: Hero ────────────────────────────────────────────────────────────
 
 function HeroSection({ image }: { image: string }) {
-  const bg = image
-    ? `linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("${image}") center / cover no-repeat`
-    : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.75) 100%)'
-
   return (
     <section
       id="hero"
@@ -62,7 +58,10 @@ function HeroSection({ image }: { image: string }) {
       {/* Animated background */}
       <div
         className="absolute inset-0 anim-hero-bg"
-        style={{ background: bg, backgroundColor: '#1a1a1a' }}
+        style={{
+          background: `linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("${image}") center / cover no-repeat`,
+          backgroundColor: '#1a1a1a',
+        }}
       />
 
       {/* Content */}
@@ -119,11 +118,10 @@ function HeroSection({ image }: { image: string }) {
 
 function BrandStrip() {
   const items = [
-    'Design Milanais',
-    'Polycarbon & Ultra Thin',
-    'Retrait en boutique · Casablanca',
-    'Garantie officielle',
-    'Livraison nationale bientôt',
+    'Montres italiennes prenium',
+    'Payement differé jusque 4X',
+    'Payement à la livraison',
+    'Livraison nationale',
   ]
 
   return (
