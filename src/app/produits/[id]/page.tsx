@@ -15,8 +15,9 @@ async function getProduct(id: string): Promise<Product | null> {
       .from('products')
       .select('*')
       .eq('id', id)
+      .eq('actif', true)
       .single()
-    if (data) return data
+    if (data) return data as Product
   } catch {
     /* fall through to mock */
   }
@@ -26,13 +27,37 @@ async function getProduct(id: string): Promise<Product | null> {
 async function getRelated(current: Product): Promise<Product[]> {
   try {
     const supabase = await createClient()
+
+    // Priority: same collection
+    if (current.collection) {
+      const { data: sameColl } = await supabase
+        .from('products')
+        .select('*')
+        .eq('actif', true)
+        .eq('collection', current.collection)
+        .neq('id', current.id)
+        .limit(3)
+      if (sameColl && sameColl.length >= 3) return sameColl as Product[]
+
+      if (sameColl && sameColl.length > 0) {
+        const { data: others } = await supabase
+          .from('products')
+          .select('*')
+          .eq('actif', true)
+          .neq('id', current.id)
+          .neq('collection', current.collection)
+          .limit(3 - sameColl.length)
+        return [...sameColl, ...(others ?? [])].slice(0, 3) as Product[]
+      }
+    }
+
     const { data } = await supabase
       .from('products')
       .select('*')
       .eq('actif', true)
       .neq('id', current.id)
       .limit(3)
-    if (data && data.length > 0) return data
+    if (data && data.length > 0) return data as Product[]
   } catch {
     /* fall through to mock */
   }
@@ -45,20 +70,27 @@ function productImages(p: Product): string[] {
   )
 }
 
-interface Spec { label: string; value: string }
+interface Spec {
+  label: string
+  value: string | null
+}
 
 function buildSpecs(p: Product): Spec[] {
-  const pairs: [string, string | null][] = [
-    ['Boîtier', p.boitier],
-    ['Lunette', p.lunette],
-    ['Cadran', p.cadran],
-    ['Bracelet', p.bracelet],
-    ['Mouvement', p.mouvement],
-    ['Étanchéité', p.resistance],
+  return [
+    { label: 'Taille du boîtier', value: p.boitier },
+    { label: 'Matériau du boîtier', value: p.materiau },
+    { label: 'Bracelet', value: p.bracelet },
+    { label: 'Fermoir', value: p.fermoir },
+    { label: 'Lunette', value: p.lunette },
+    { label: 'Fond de boîtier', value: p.fond },
+    { label: 'Cadran', value: p.cadran },
+    { label: 'Aiguilles & index', value: p.aiguilles },
+    { label: 'Verre', value: p.verre },
+    { label: 'Mouvement', value: p.mouvement },
+    { label: "Résistance à l'eau & poids", value: p.resistance },
+    { label: 'Référence', value: p.ref },
+    ...(p.sku ? [{ label: 'SKU', value: p.sku }] : []),
   ]
-  return pairs
-    .filter(([, v]) => v !== null)
-    .map(([l, v]) => ({ label: l, value: v as string }))
 }
 
 function mentionClass(mention: string | null): string {
@@ -77,10 +109,12 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
   const related = await getRelated(product)
   const images = productImages(product)
   const specs = buildSpecs(product)
+  const hasReduc = !!product.reduction && !!product.prix_reduc
 
   return (
     <div className="pt-[80px] min-h-screen">
-      {/* Breadcrumb */}
+
+      {/* ── Breadcrumb ── */}
       <div className="px-12 py-5 text-[0.68rem] tracking-[0.12em] text-gm max-md:px-6">
         <Link href="/" className="text-gm no-underline hover:text-rg">Accueil</Link>
         <span className="mx-2">›</span>
@@ -89,13 +123,16 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
         <span>{product.nom}</span>
       </div>
 
-      {/* Detail grid */}
+      {/* ── Detail grid ── */}
       <div className="grid grid-cols-1 md:grid-cols-2" style={{ minHeight: '80vh' }}>
+
         {/* Gallery */}
         <ProductGallery images={images} name={product.nom} />
 
         {/* Info */}
         <div className="px-12 py-13 max-md:px-6 max-md:py-8">
+
+          {/* Collection + name + ref */}
           <div className="text-[0.66rem] tracking-[0.28em] uppercase text-rg mb-2">
             {product.collection}
           </div>
@@ -105,14 +142,15 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
           >
             {product.nom}
           </h1>
-          <div className="text-[0.7rem] text-gm tracking-[0.1em] mb-5">
+          <div className="text-[0.7rem] text-gm tracking-[0.1em] mb-4">
             Réf. {product.ref}
           </div>
 
+          {/* Mention badge */}
           {product.mention && (
             <span
               className={[
-                'inline-block text-[0.6rem] tracking-[0.15em] uppercase px-2.5 py-[5px] font-normal mb-5',
+                'inline-block text-[0.6rem] tracking-[0.15em] uppercase px-2.5 py-[5px] font-normal mb-4',
                 mentionClass(product.mention),
               ].join(' ')}
             >
@@ -120,49 +158,96 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
             </span>
           )}
 
-          <div
-            className="font-light tracking-[0.04em] mb-1.5"
-            style={{ fontSize: '1.8rem' }}
-          >
-            {formatPrice(product.prix_reduc ?? product.prix)}
-          </div>
-          <div className="text-[0.72rem] text-gm mb-7">
+          {/* ── Prix ── */}
+          {hasReduc ? (
+            <div className="flex flex-wrap items-baseline gap-2.5 mb-1.5">
+              <span className="font-light tracking-[0.04em]" style={{ fontSize: '1.8rem' }}>
+                {formatPrice(product.prix_reduc!)}
+              </span>
+              <span className="text-gm line-through" style={{ fontSize: '1.1rem' }}>
+                {formatPrice(product.prix)}
+              </span>
+              <span
+                className="text-[0.6rem] tracking-[0.15em] uppercase px-2 py-1"
+                style={{ background: 'rgba(201,149,108,0.1)', color: '#c9956c' }}
+              >
+                -{product.reduction}%
+              </span>
+            </div>
+          ) : (
+            <div className="font-light tracking-[0.04em] mb-1.5" style={{ fontSize: '1.8rem' }}>
+              {formatPrice(product.prix)}
+            </div>
+          )}
+          <div className="text-[0.72rem] text-gm mb-5">
             TTC · Paiement uniquement en boutique
           </div>
 
-          <div className="h-[1px] bg-gl my-6" />
-
-          {/* Specs */}
-          {specs.length > 0 && (
-            <div className="grid grid-cols-2 gap-3.5 mb-6">
-              {specs.map((s) => (
-                <div key={s.label}>
-                  <div className="text-[0.62rem] tracking-[0.2em] uppercase text-gm mb-0.5">
-                    {s.label}
-                  </div>
-                  <div className="text-[0.82rem] font-normal">{s.value}</div>
-                </div>
-              ))}
+          {/* ── Stock ── */}
+          {product.stock === 0 ? (
+            <div
+              className="inline-block text-[0.63rem] tracking-[0.18em] uppercase px-3 py-1.5 mb-5"
+              style={{ color: '#ef4444', background: 'rgba(239,68,68,0.07)', border: '1px solid rgba(239,68,68,0.2)' }}
+            >
+              Rupture de stock
             </div>
-          )}
+          ) : product.stock <= 3 ? (
+            <div
+              className="inline-block text-[0.63rem] tracking-[0.18em] uppercase px-3 py-1.5 mb-5"
+              style={{ color: '#f97316', background: 'rgba(249,115,22,0.07)', border: '1px solid rgba(249,115,22,0.2)' }}
+            >
+              Plus que {product.stock} en stock
+            </div>
+          ) : null}
 
           <div className="h-[1px] bg-gl my-6" />
 
-          {/* Description */}
+          {/* ── Specs techniques ── */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-4 mb-6">
+            {specs.map((s) => (
+              <div key={s.label}>
+                <div className="text-[0.6rem] tracking-[0.2em] uppercase text-gm mb-0.5">
+                  {s.label}
+                </div>
+                <div
+                  className="text-[0.82rem] font-normal"
+                  style={{ color: s.value ? '#0a0a0a' : 'rgba(154,149,144,0.5)' }}
+                >
+                  {s.value ?? '—'}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="h-[1px] bg-gl my-6" />
+
+          {/* ── Description ── */}
           {product.description && (
-            <p className="text-[0.83rem] font-light leading-[1.8] text-gd mb-7">
+            <p
+              className="text-[0.83rem] font-light leading-[1.85] text-gd mb-7 italic pl-4"
+              style={{ borderLeft: '2px solid #c9956c' }}
+            >
               {product.description}
             </p>
           )}
 
-          {/* Actions */}
+          {/* ── Actions ── */}
           <div className="flex flex-col gap-3">
-            <Link
-              href={`/commande?id=${product.id}`}
-              className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-black px-[30px] py-[17px] no-underline transition-colors duration-200 hover:bg-rg"
-            >
-              ✦ Commander ce modèle ✦
-            </Link>
+            {product.stock === 0 ? (
+              <Link
+                href={`/alerter?id=${product.id}`}
+                className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-gd px-[30px] py-[17px] no-underline transition-colors duration-200 hover:bg-black"
+              >
+                🔔 M&apos;alerter quand disponible
+              </Link>
+            ) : (
+              <Link
+                href={`/commande?id=${product.id}`}
+                className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-black px-[30px] py-[17px] no-underline transition-colors duration-200 hover:bg-rg"
+              >
+                ✦ Commander ce modèle ✦
+              </Link>
+            )}
             <Link
               href="/catalogue"
               className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-light text-black border border-black px-[28px] py-[13px] no-underline transition-all duration-200 hover:bg-black hover:text-white"
@@ -179,7 +264,7 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
         </div>
       </div>
 
-      {/* Related */}
+      {/* ── Vous aimerez aussi ── */}
       {related.length > 0 && (
         <div className="px-12 py-16 bg-off max-md:px-5 max-md:py-12">
           <p className="text-[0.66rem] tracking-[0.3em] uppercase text-rg font-normal mb-2.5">
@@ -220,8 +305,15 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
                 <div className="text-[0.65rem] text-gm tracking-[0.08em] mb-2">
                   Réf. {rel.ref}
                 </div>
-                <div className="text-[0.92rem] font-normal tracking-[0.04em]">
-                  {formatPrice(rel.prix_reduc ?? rel.prix)}{' '}
+                <div className="flex items-baseline gap-2">
+                  <span className="text-[0.92rem] font-normal tracking-[0.04em]">
+                    {formatPrice(rel.prix_reduc ?? rel.prix)}
+                  </span>
+                  {rel.prix_reduc && (
+                    <span className="text-[0.7rem] text-gm line-through">
+                      {formatPrice(rel.prix)}
+                    </span>
+                  )}
                   <span className="text-[0.68rem] text-gm">TTC</span>
                 </div>
               </Link>

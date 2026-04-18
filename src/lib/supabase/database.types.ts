@@ -84,6 +84,7 @@ export type Database = {
           created_at?: string
         }
         Update: Partial<Omit<Product, 'id' | 'created_at'>>
+        Relationships: []
       }
       orders: {
         Row: Order
@@ -92,6 +93,7 @@ export type Database = {
           created_at?: string
         }
         Update: Partial<Omit<Order, 'id' | 'created_at'>>
+        Relationships: []
       }
       site_images: {
         Row: SiteImage
@@ -100,8 +102,11 @@ export type Database = {
           updated_at?: string
         }
         Update: Partial<Omit<SiteImage, 'id'>>
+        Relationships: []
       }
     }
+    Views: Record<never, never>
+    Functions: Record<never, never>
     Enums: {
       statut_commande: StatutCommande
     }

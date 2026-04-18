@@ -1,11 +1,36 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
-import { MOCK_PRODUCTS, formatPrice } from '@/lib/mock-products'
+import { MOCK_PRODUCTS } from '@/lib/mock-products'
 import HomeCatalogueSection from '@/components/HomeCatalogueSection'
-import type { Product } from '@/lib/supabase/database.types'
+import type { Product, SiteImage } from '@/lib/supabase/database.types'
 
 // ─── Data fetching ────────────────────────────────────────────────────────────
+
+type SiteImageKey = 'hero' | 'life1' | 'life2' | 'life3' | 'life4'
+type SiteImages = Record<SiteImageKey, string>
+
+const PLACEHOLDERS: SiteImages = {
+  hero: '',
+  life1: '',
+  life2: '',
+  life3: '',
+  life4: '',
+}
+
+async function getSiteImages(): Promise<SiteImages> {
+  try {
+    const supabase = await createClient()
+    const { data } = await supabase.from('site_images').select('*')
+    const result: SiteImages = { ...PLACEHOLDERS }
+    for (const row of (data as SiteImage[] | null) ?? []) {
+      if (row.cle in result) result[row.cle as SiteImageKey] = row.url
+    }
+    return result
+  } catch {
+    return { ...PLACEHOLDERS }
+  }
+}
 
 async function getProducts(): Promise<Product[]> {
   try {
@@ -24,7 +49,11 @@ async function getProducts(): Promise<Product[]> {
 
 // ─── Section: Hero ────────────────────────────────────────────────────────────
 
-function HeroSection() {
+function HeroSection({ image }: { image: string }) {
+  const bg = image
+    ? `linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("${image}") center / cover no-repeat`
+    : 'linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.75) 100%)'
+
   return (
     <section
       id="hero"
@@ -33,11 +62,7 @@ function HeroSection() {
       {/* Animated background */}
       <div
         className="absolute inset-0 anim-hero-bg"
-        style={{
-          background:
-            'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("/hero-placeholder.jpg") center / cover no-repeat',
-          backgroundColor: '#1a1a1a',
-        }}
+        style={{ background: bg, backgroundColor: '#1a1a1a' }}
       />
 
       {/* Content */}
@@ -225,7 +250,7 @@ function CollectionsSection({ products }: { products: Product[] }) {
 
 // ─── Section: Lifestyle ───────────────────────────────────────────────────────
 
-function LifestyleSection() {
+function LifestyleSection({ images }: { images: SiteImages }) {
   return (
     <section id="lifestyle" className="bg-black py-[88px] overflow-hidden">
       <div className="px-12 mb-11 flex justify-between items-end flex-wrap gap-4 max-md:px-5">
@@ -249,12 +274,22 @@ function LifestyleSection() {
 
       {/* Image strip */}
       <div className="flex gap-[2px]">
-        {[1, 2, 3, 4].map((n) => (
+        {(['life1', 'life2', 'life3', 'life4'] as const).map((key) => (
           <div
-            key={n}
-            className="flex-none bg-gd transition-all duration-500 hover:flex-[0_0_35%]"
+            key={key}
+            className="relative flex-none bg-gd transition-all duration-500 hover:flex-[0_0_35%]"
             style={{ flex: '0 0 25%', height: '320px', filter: 'grayscale(15%)' }}
-          />
+          >
+            {images[key] && (
+              <Image
+                src={images[key]}
+                alt=""
+                fill
+                className="object-cover"
+                sizes="25vw"
+              />
+            )}
+          </div>
         ))}
       </div>
     </section>
@@ -329,15 +364,15 @@ function ProcessSection() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const products = await getProducts()
+  const [products, siteImages] = await Promise.all([getProducts(), getSiteImages()])
 
   return (
     <>
-      <HeroSection />
+      <HeroSection image={siteImages.hero} />
       <BrandStrip />
       <CollectionsSection products={products} />
       <HomeCatalogueSection products={products} />
-      <LifestyleSection />
+      <LifestyleSection images={siteImages} />
       <ProcessSection />
     </>
   )
