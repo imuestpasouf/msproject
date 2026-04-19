@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import HomeCatalogueSection from '@/components/HomeCatalogueSection'
-import { MOCK_PRODUCTS } from '@/lib/mock-products'
 import type { Product } from '@/lib/supabase/database.types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────

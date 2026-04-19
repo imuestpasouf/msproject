@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { useCart } from '@/context/CartContext'
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { count, openDrawer } = useCart()
 
   return (
     <>
@@ -36,10 +38,29 @@ export default function Navbar() {
           </li>
         </ul>
 
-        <Link href="/catalogue"
-              className="hidden md:block text-[0.7rem] tracking-[0.16em] uppercase font-normal text-white bg-black px-[22px] py-[10px] no-underline hover:bg-rg transition-colors duration-200">
-          Voir les montres
-        </Link>
+        <div className="hidden md:flex items-center gap-4">
+          <button
+            type="button"
+            onClick={openDrawer}
+            className="relative w-9 h-9 flex items-center justify-center cursor-pointer bg-transparent border-none text-gd hover:text-black transition-colors"
+            aria-label="Panier"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
+            </svg>
+            {count > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 rounded-full bg-rg text-white flex items-center justify-center text-[0.55rem] font-normal leading-none">
+                {count}
+              </span>
+            )}
+          </button>
+          <Link href="/catalogue"
+                className="text-[0.7rem] tracking-[0.16em] uppercase font-normal text-white bg-black px-[22px] py-[10px] no-underline hover:bg-rg transition-colors duration-200">
+            Voir les montres
+          </Link>
+        </div>
 
         {/* Hamburger */}
         <button

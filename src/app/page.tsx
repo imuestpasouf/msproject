@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/server'
-import { MOCK_PRODUCTS } from '@/lib/mock-products'
+import { createServiceClient } from '@/lib/supabase/service'
 import HomeCatalogueSection from '@/components/HomeCatalogueSection'
 import type { Product, SiteImage } from '@/lib/supabase/database.types'
 
@@ -10,40 +9,37 @@ import type { Product, SiteImage } from '@/lib/supabase/database.types'
 type SiteImageKey = 'hero' | 'life1' | 'life2' | 'life3' | 'life4'
 type SiteImages = Record<SiteImageKey, string>
 
-const PLACEHOLDERS: SiteImages = {
-  hero: '/placeholders/hero.jpg',
-  life1: '/placeholders/lifestyle.jpg',
-  life2: '/placeholders/lifestyle.jpg',
-  life3: '/placeholders/lifestyle.jpg',
-  life4: '/placeholders/lifestyle.jpg',
-}
+const PLACEHOLDERS: SiteImages = { hero: '', life1: '', life2: '', life3: '', life4: '' }
 
 async function getSiteImages(): Promise<SiteImages> {
   try {
-    const supabase = await createClient()
+    const supabase = createServiceClient()
     const { data } = await supabase.from('site_images').select('*')
     const result: SiteImages = { ...PLACEHOLDERS }
     for (const row of (data as SiteImage[] | null) ?? []) {
       if (row.cle in result) result[row.cle as SiteImageKey] = row.url
     }
     return result
-  } catch {
+  } catch (e) {
+    console.error('[getSiteImages]', e)
     return { ...PLACEHOLDERS }
   }
 }
 
 async function getProducts(): Promise<Product[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createServiceClient()
     const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('actif', true)
       .order('ordre', { ascending: true })
-    if (error || !data || data.length === 0) return MOCK_PRODUCTS
-    return data
-  } catch {
-    return MOCK_PRODUCTS
+    if (error) { console.error('[getProducts]', error); return [] }
+    if (!data) return []
+    return data as Product[]
+  } catch (e) {
+    console.error('[getProducts]', e)
+    return []
   }
 }
 
@@ -121,7 +117,8 @@ function BrandStrip() {
     'Montres italiennes prenium',
     'Payement differé jusque 4X',
     'Payement à la livraison',
-    'Livraison nationale',
+    'Garantie officielle',
+    'Livraison nationale bientôt',
   ]
 
   return (

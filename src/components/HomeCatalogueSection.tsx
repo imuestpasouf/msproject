@@ -4,7 +4,14 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Product } from '@/lib/supabase/database.types'
-import { COLLECTION_FILTER, formatPrice } from '@/lib/mock-products'
+function formatPrice(n: number) { return n.toLocaleString('fr-MA') + ' MAD' }
+
+const COLLECTION_FILTER: Record<string, string> = {
+  Polycarbon: 'polycarbon',
+  'Ultra Thin': 'ultrathin',
+  Skeleton: 'skeleton',
+  Tahoe: 'tahoe',
+}
 
 const FILTERS = [
   { key: 'all', label: 'Tout' },

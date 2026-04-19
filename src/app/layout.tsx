@@ -4,6 +4,8 @@ import './globals.css'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import MarqueeBanner from '@/components/ui/MarqueeBanner'
+import CartDrawer from '@/components/ui/CartDrawer'
+import { CartProvider } from '@/context/CartContext'
 
 const cormorant = Cormorant_Garamond({
   variable: '--font-cormorant',
@@ -35,29 +37,30 @@ export default function RootLayout({
       className={`${cormorant.variable} ${jost.variable}`}
     >
       <body className="min-h-screen flex flex-col">
-        {/* Single fixed header — Navbar + MarqueeBanner stack naturally,
-            no hardcoded pixel offsets between them */}
-        <header className="fixed top-0 left-0 right-0 z-[100]">
-          <Navbar />
-          <MarqueeBanner />
-        </header>
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <CartProvider>
+          <header className="fixed top-0 left-0 right-0 z-[100]">
+            <Navbar />
+            <MarqueeBanner />
+          </header>
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <CartDrawer />
 
-        {/* WhatsApp float — external URL, <a> not <Link> */}
-        <a
-          href="https://wa.me/212600000000"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-[150] flex items-center justify-center w-[50px] h-[50px] rounded-full text-white text-[1.4rem] no-underline transition-transform duration-200 hover:scale-110"
-          style={{
-            background: '#25D366',
-            boxShadow: '0 4px 20px rgba(37,211,102,0.4)',
-          }}
-          aria-label="Contacter sur WhatsApp"
-        >
-          💬
-        </a>
+          {/* WhatsApp float */}
+          <a
+            href="https://wa.me/212600000000"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="fixed bottom-6 right-6 z-[150] flex items-center justify-center w-[50px] h-[50px] rounded-full text-white text-[1.4rem] no-underline transition-transform duration-200 hover:scale-110"
+            style={{
+              background: '#25D366',
+              boxShadow: '0 4px 20px rgba(37,211,102,0.4)',
+            }}
+            aria-label="Contacter sur WhatsApp"
+          >
+            💬
+          </a>
+        </CartProvider>
       </body>
     </html>
   )

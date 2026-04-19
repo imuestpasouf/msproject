@@ -1,32 +1,36 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { MOCK_PRODUCTS, formatPrice } from '@/lib/mock-products'
+import { createServiceClient } from '@/lib/supabase/service'
 import type { Product } from '@/lib/supabase/database.types'
 import ProductGallery from '@/components/ProductGallery'
+import AddToCartButton from '@/components/ui/AddToCartButton'
+
+function formatPrice(n: number) { return n.toLocaleString('fr-MA') + ' MAD' }
 
 // ─── Data helpers ─────────────────────────────────────────────────────────────
 
 async function getProduct(id: string): Promise<Product | null> {
   try {
-    const supabase = await createClient()
-    const { data } = await supabase
+    const supabase = createServiceClient()
+    const { data, error } = await supabase
       .from('products')
       .select('*')
       .eq('id', id)
       .eq('actif', true)
       .single()
+    if (error) { console.error('[getProduct]', error); return null }
     if (data) return data as Product
-  } catch {
-    /* fall through to mock */
+  } catch (e) {
+    console.error('[getProduct]', e)
+    return null
   }
-  return MOCK_PRODUCTS.find((p) => p.id === id) ?? null
+  return null
 }
 
 async function getRelated(current: Product): Promise<Product[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createServiceClient()
 
     // Priority: same collection
     if (current.collection) {
@@ -58,10 +62,11 @@ async function getRelated(current: Product): Promise<Product[]> {
       .neq('id', current.id)
       .limit(3)
     if (data && data.length > 0) return data as Product[]
-  } catch {
-    /* fall through to mock */
+  } catch (e) {
+    console.error('[getRelated]', e)
+    return []
   }
-  return MOCK_PRODUCTS.filter((p) => p.id !== current.id).slice(0, 3)
+  return []
 }
 
 function productImages(p: Product): string[] {
@@ -241,12 +246,20 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
                 🔔 M&apos;alerter quand disponible
               </Link>
             ) : (
-              <Link
-                href={`/commande?id=${product.id}`}
-                className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-black px-[30px] py-[17px] no-underline transition-colors duration-200 hover:bg-rg"
-              >
-                ✦ Commander ce modèle ✦
-              </Link>
+              <AddToCartButton
+                stock={product.stock}
+                product={{
+                  product_id: product.id,
+                  nom: product.nom,
+                  ref: product.ref,
+                  collection: product.collection,
+                  photo_principale: product.photo_principale,
+                  prix: product.prix,
+                  prix_reduc: product.prix_reduc,
+                  reduction: product.reduction,
+                  quantite: 1,
+                }}
+              />
             )}
             <Link
               href="/catalogue"
