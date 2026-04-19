@@ -257,7 +257,7 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
                   prix: product.prix,
                   prix_reduc: product.prix_reduc,
                   reduction: product.reduction,
-                  quantite: 1,
+                  stock: product.stock,
                 }}
               />
             )}

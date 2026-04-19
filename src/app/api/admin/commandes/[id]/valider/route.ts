@@ -4,7 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/admin-session'
 import { sendEmail } from '@/lib/brevo'
 import { buildConfirmationHtml, buildConfirmationInternalHtml } from '@/lib/emails/confirmation'
-import type { Order, Product } from '@/lib/supabase/database.types'
+import type { Order } from '@/lib/supabase/database.types'
 
 type Ctx = { params: Promise<{ id: string }> }
 
@@ -58,24 +58,6 @@ export async function POST(_req: NextRequest, { params }: Ctx) {
     .single()
 
   if (updateErr) return Response.json({ error: updateErr.message }, { status: 500 })
-
-  // Decrement product stock
-  if (order.product_id) {
-    const { data: prod } = await supabase
-      .from('products')
-      .select('stock')
-      .eq('id', order.product_id)
-      .single()
-
-    if (prod) {
-      const prodRow = prod as Pick<Product, 'stock'>
-      await supabase
-        .from('products')
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update({ stock: Math.max(0, prodRow.stock - 1) } as any)
-        .eq('id', order.product_id)
-    }
-  }
 
   // Send emails (non-blocking)
   const productNom = order.product_id

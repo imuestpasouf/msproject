@@ -6,7 +6,7 @@ export async function sendEmail(
   to: string,
   subject: string,
   htmlContent: string,
-  senderName = 'D1 Milano Maroc',
+  senderName = 'MS Stores',
   senderEmail = process.env.BREVO_SENDER_EMAIL!
 ): Promise<void> {
   await axios.post(

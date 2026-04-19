@@ -7,7 +7,7 @@ import { useCart } from '@/context/CartContext'
 function formatPrice(n: number) { return n.toLocaleString('fr-MA') + ' MAD' }
 
 export default function PanierPage() {
-  const { items, total, removeItem, clearCart } = useCart()
+  const { items, total, removeItem, updateQuantity, clearCart } = useCart()
 
   if (items.length === 0) {
     return (
@@ -39,7 +39,7 @@ export default function PanierPage() {
         <div className="mb-8">
           <p className="text-[0.62rem] tracking-[0.28em] uppercase text-rg mb-1.5">Mon panier</p>
           <h1 className="font-display font-light text-black" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.4rem)' }}>
-            {items.length} article{items.length !== 1 ? 's' : ''}
+            {items.reduce((s, i) => s + i.quantite, 0)} article{items.reduce((s, i) => s + i.quantite, 0) !== 1 ? 's' : ''}
           </h1>
         </div>
 
@@ -53,13 +53,7 @@ export default function PanierPage() {
                 <Link href={`/produits/${item.product_id}`} className="flex-shrink-0">
                   <div className="bg-off overflow-hidden" style={{ width: 96, height: 96 }}>
                     {item.photo_principale ? (
-                      <Image
-                        src={item.photo_principale}
-                        alt={item.nom}
-                        width={96}
-                        height={96}
-                        className="w-full h-full object-cover"
-                      />
+                      <Image src={item.photo_principale} alt={item.nom} width={96} height={96} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full bg-gl" />
                     )}
@@ -73,19 +67,36 @@ export default function PanierPage() {
                     <p className="text-[0.95rem] font-light text-black leading-tight mb-0.5 hover:text-rg transition-colors">{item.nom}</p>
                   </Link>
                   <p className="text-[0.65rem] text-gm mb-3">Réf. {item.ref}</p>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[0.95rem] font-light" style={{ color: item.prix_reduc ? '#c9956c' : '#0a0a0a' }}>
-                      {formatPrice(item.prix_reduc ?? item.prix)}
-                    </span>
-                    {item.prix_reduc && (
-                      <span className="text-[0.7rem] text-gm line-through">{formatPrice(item.prix)}</span>
-                    )}
-                    {item.prix_reduc && item.reduction && (
-                      <span className="text-[0.58rem] tracking-[0.12em] uppercase px-1.5 py-0.5"
-                            style={{ background: 'rgba(201,149,108,0.1)', color: '#c9956c' }}>
-                        -{item.reduction}%
+
+                  {/* Qty stepper */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center">
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(item.product_id, item.quantite - 1)}
+                        className="w-7 h-7 flex items-center justify-center border border-gl text-gm hover:border-black hover:text-black transition-colors cursor-pointer bg-transparent text-[0.85rem]"
+                      >
+                        −
+                      </button>
+                      <span className="w-9 h-7 flex items-center justify-center border-t border-b border-gl text-[0.82rem] font-light select-none">
+                        {item.quantite}
                       </span>
-                    )}
+                      <button
+                        type="button"
+                        onClick={() => updateQuantity(item.product_id, Math.min(item.quantite + 1, item.stock))}
+                        className="w-7 h-7 flex items-center justify-center border border-gl text-gm hover:border-black hover:text-black transition-colors cursor-pointer bg-transparent text-[0.85rem]"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[0.95rem] font-light" style={{ color: item.prix_reduc ? '#c9956c' : '#0a0a0a' }}>
+                        {formatPrice((item.prix_reduc ?? item.prix) * item.quantite)}
+                      </span>
+                      {item.prix_reduc && item.quantite === 1 && (
+                        <span className="text-[0.7rem] text-gm line-through">{formatPrice(item.prix)}</span>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -123,9 +134,11 @@ export default function PanierPage() {
               <div className="flex flex-col gap-3 mb-5">
                 {items.map((item) => (
                   <div key={item.product_id} className="flex justify-between items-baseline gap-3">
-                    <span className="text-[0.78rem] font-light text-gd truncate">{item.nom}</span>
+                    <span className="text-[0.78rem] font-light text-gd truncate">
+                      {item.nom}{item.quantite > 1 && <span className="text-gm"> ×{item.quantite}</span>}
+                    </span>
                     <span className="text-[0.78rem] font-light text-black flex-shrink-0">
-                      {formatPrice(item.prix_reduc ?? item.prix)}
+                      {formatPrice((item.prix_reduc ?? item.prix) * item.quantite)}
                     </span>
                   </div>
                 ))}
@@ -151,14 +164,6 @@ export default function PanierPage() {
               >
                 ← Continuer mes achats
               </Link>
-            </div>
-
-            <div className="bg-white p-5">
-              <p className="text-[0.68rem] text-gm text-center leading-[1.7]">
-                📱 Confirmation par <strong className="text-rg">email & WhatsApp</strong><br />
-                Retrait en boutique · Casablanca<br />
-                Paiement uniquement en boutique
-              </p>
             </div>
           </div>
         </div>

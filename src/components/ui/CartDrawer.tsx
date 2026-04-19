@@ -8,15 +8,13 @@ import { useCart } from '@/context/CartContext'
 function formatPrice(n: number) { return n.toLocaleString('fr-MA') + ' MAD' }
 
 export default function CartDrawer() {
-  const { items, total, removeItem, isDrawerOpen, closeDrawer } = useCart()
+  const { items, total, removeItem, updateQuantity, isDrawerOpen, closeDrawer } = useCart()
 
-  // Lock body scroll when drawer open
   useEffect(() => {
     document.body.style.overflow = isDrawerOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
   }, [isDrawerOpen])
 
-  // Close on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') closeDrawer() }
     window.addEventListener('keydown', handler)
@@ -41,7 +39,7 @@ export default function CartDrawer() {
       <div
         className="fixed top-0 right-0 z-[160] h-full flex flex-col bg-white"
         style={{
-          width: 'min(400px, 100vw)',
+          width: 'min(420px, 100vw)',
           transform: isDrawerOpen ? 'translateX(0)' : 'translateX(100%)',
           transition: 'transform 300ms ease',
           boxShadow: '-4px 0 32px rgba(0,0,0,0.12)',
@@ -53,7 +51,9 @@ export default function CartDrawer() {
         <div className="flex items-center justify-between px-6 py-5 border-b border-gl flex-shrink-0">
           <div>
             <p className="text-[0.6rem] tracking-[0.25em] uppercase text-rg mb-0.5">Mon panier</p>
-            <p className="text-[0.75rem] text-gm">{items.length} article{items.length !== 1 ? 's' : ''}</p>
+            <p className="text-[0.75rem] text-gm">
+              {items.reduce((s, i) => s + i.quantite, 0)} article{items.reduce((s, i) => s + i.quantite, 0) !== 1 ? 's' : ''}
+            </p>
           </div>
           <button
             type="button"
@@ -94,15 +94,9 @@ export default function CartDrawer() {
                 <div key={item.product_id} className="flex gap-4 pb-4 border-b border-gl last:border-none">
                   {/* Photo */}
                   <Link href={`/produits/${item.product_id}`} onClick={closeDrawer} className="flex-shrink-0">
-                    <div className="w-18 h-18 bg-off overflow-hidden" style={{ width: 72, height: 72 }}>
+                    <div className="bg-off overflow-hidden" style={{ width: 72, height: 72 }}>
                       {item.photo_principale ? (
-                        <Image
-                          src={item.photo_principale}
-                          alt={item.nom}
-                          width={72}
-                          height={72}
-                          className="w-full h-full object-cover"
-                        />
+                        <Image src={item.photo_principale} alt={item.nom} width={72} height={72} className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full bg-gl" />
                       )}
@@ -114,13 +108,31 @@ export default function CartDrawer() {
                     <p className="text-[0.62rem] tracking-[0.18em] uppercase text-rg mb-0.5">{item.collection}</p>
                     <p className="text-[0.85rem] font-light text-black leading-tight mb-0.5 truncate">{item.nom}</p>
                     <p className="text-[0.65rem] text-gm mb-2">Réf. {item.ref}</p>
-                    <div className="flex items-baseline gap-2">
-                      <span className="text-[0.9rem] font-light" style={{ color: item.prix_reduc ? '#c9956c' : '#0a0a0a' }}>
-                        {formatPrice(item.prix_reduc ?? item.prix)}
+
+                    {/* Qty + price row */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center">
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.product_id, item.quantite - 1)}
+                          className="w-6 h-6 flex items-center justify-center border border-gl text-gm hover:border-black hover:text-black transition-colors cursor-pointer bg-transparent text-[0.8rem]"
+                        >
+                          −
+                        </button>
+                        <span className="w-8 h-6 flex items-center justify-center border-t border-b border-gl text-[0.78rem] font-light select-none">
+                          {item.quantite}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(item.product_id, Math.min(item.quantite + 1, item.stock))}
+                          className="w-6 h-6 flex items-center justify-center border border-gl text-gm hover:border-black hover:text-black transition-colors cursor-pointer bg-transparent text-[0.8rem]"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <span className="text-[0.88rem] font-light" style={{ color: item.prix_reduc ? '#c9956c' : '#0a0a0a' }}>
+                        {formatPrice((item.prix_reduc ?? item.prix) * item.quantite)}
                       </span>
-                      {item.prix_reduc && (
-                        <span className="text-[0.68rem] text-gm line-through">{formatPrice(item.prix)}</span>
-                      )}
                     </div>
                   </div>
 
@@ -131,7 +143,7 @@ export default function CartDrawer() {
                     className="flex-shrink-0 self-start mt-1 w-6 h-6 flex items-center justify-center cursor-pointer bg-transparent border-none text-gm hover:text-red-500 transition-colors"
                     aria-label="Supprimer"
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                       <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
                     </svg>
                   </button>

@@ -13,7 +13,8 @@ export interface CartItem {
   prix: number
   prix_reduc: number | null
   reduction: number | null
-  quantite: 1
+  quantite: number
+  stock: number
 }
 
 interface CartContextType {
@@ -21,6 +22,7 @@ interface CartContextType {
   count: number
   total: number
   addItem: (item: CartItem) => void
+  updateQuantity: (productId: string, qty: number) => void
   removeItem: (productId: string) => void
   clearCart: () => void
   isDrawerOpen: boolean
@@ -50,13 +52,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
   const [hydrated, setHydrated] = useState(false)
 
-  // Hydrate from localStorage after mount (avoid SSR mismatch)
   useEffect(() => {
     setItems(loadFromStorage())
     setHydrated(true)
   }, [])
 
-  // Persist to localStorage whenever items change (after hydration)
   useEffect(() => {
     if (hydrated) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
@@ -65,9 +65,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = useCallback((item: CartItem) => {
     setItems((prev) => {
-      // Max 1 unité par produit
-      if (prev.some((i) => i.product_id === item.product_id)) return prev
-      return [...prev, { ...item, quantite: 1 }]
+      const existing = prev.find((i) => i.product_id === item.product_id)
+      if (existing) {
+        const newQty = Math.min(existing.quantite + item.quantite, item.stock)
+        return prev.map((i) =>
+          i.product_id === item.product_id ? { ...i, quantite: newQty } : i
+        )
+      }
+      return [...prev, { ...item, quantite: Math.min(item.quantite, item.stock) }]
+    })
+  }, [])
+
+  const updateQuantity = useCallback((productId: string, qty: number) => {
+    setItems((prev) => {
+      if (qty <= 0) return prev.filter((i) => i.product_id !== productId)
+      return prev.map((i) =>
+        i.product_id === productId
+          ? { ...i, quantite: Math.min(qty, i.stock) }
+          : i
+      )
     })
   }, [])
 
@@ -77,8 +93,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const clearCart = useCallback(() => setItems([]), [])
 
-  const count = items.length
-  const total = items.reduce((sum, i) => sum + (i.prix_reduc ?? i.prix), 0)
+  const count = items.reduce((s, i) => s + i.quantite, 0)
+  const total = items.reduce((s, i) => s + (i.prix_reduc ?? i.prix) * i.quantite, 0)
 
   return (
     <CartContext.Provider
@@ -87,6 +103,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         count,
         total,
         addItem,
+        updateQuantity,
         removeItem,
         clearCart,
         isDrawerOpen,

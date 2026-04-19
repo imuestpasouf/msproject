@@ -14,8 +14,6 @@ function makeDb(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   )
 }
 
-// Statuses where stock was already decremented (on valider)
-const STOCK_DECREMENTED = ['validee', 'en_preparation', 'expediee']
 const TERMINAL = ['livree', 'annulee', 'remboursee']
 
 // ─── POST /api/admin/commandes/[id]/annuler ───────────────────────────────────
@@ -50,8 +48,8 @@ export async function POST(_req: NextRequest, { params }: Ctx) {
     )
   }
 
-  // Restore stock if it was decremented
-  if (order.product_id && STOCK_DECREMENTED.includes(order.statut)) {
+  // Restore stock (decremented at order placement)
+  if (order.product_id) {
     const { data: prod } = await supabase
       .from('products')
       .select('stock')
@@ -63,7 +61,7 @@ export async function POST(_req: NextRequest, { params }: Ctx) {
       await supabase
         .from('products')
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        .update({ stock: prodRow.stock + 1 } as any)
+        .update({ stock: prodRow.stock + order.quantite } as any)
         .eq('id', order.product_id)
     }
   }
