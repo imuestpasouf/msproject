@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/admin-session'
 import { sendEmail } from '@/lib/brevo'
 import { buildExpeditionHtml } from '@/lib/emails/expedition'
+import { sendWhatsAppExpedition } from '@/lib/whatsapp'
 import type { Order } from '@/lib/supabase/database.types'
 
 type Ctx = { params: Promise<{ id: string }> }
@@ -94,6 +95,7 @@ export async function POST(request: NextRequest, { params }: Ctx) {
       `Votre commande est en route — ${order.order_ref}`,
       buildExpeditionHtml(updatedOrder, productNom)
     ),
+    sendWhatsAppExpedition(updatedOrder),
   ])
 
   return Response.json({ order: updated as Order })

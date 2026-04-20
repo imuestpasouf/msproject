@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/service'
 import { sendEmail } from '@/lib/brevo'
 import { buildReceptionHtml } from '@/lib/emails/reception'
+import { sendWhatsAppReception } from '@/lib/whatsapp'
 import type { CartItem } from '@/context/CartContext'
 import type { Order } from '@/lib/supabase/database.types'
 
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
         `Commande reçue — ${order_ref}`,
         buildReceptionHtml(inserted as Order, emailItems)
       ),
+      sendWhatsAppReception(inserted as Order, emailItems.reduce((s, i) => s + i.prix_total, 0)),
     ]).catch(() => {})
 
     return NextResponse.json({ order_ref })

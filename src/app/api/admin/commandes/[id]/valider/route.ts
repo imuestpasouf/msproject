@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/admin-session'
 import { sendEmail } from '@/lib/brevo'
 import { buildConfirmationHtml, buildConfirmationInternalHtml } from '@/lib/emails/confirmation'
+import { sendWhatsAppConfirmation } from '@/lib/whatsapp'
 import type { Order } from '@/lib/supabase/database.types'
 
 type Ctx = { params: Promise<{ id: string }> }
@@ -77,6 +78,7 @@ export async function POST(_req: NextRequest, { params }: Ctx) {
       `[D1 Milano] Commande à expédier — ${order.order_ref}`,
       buildConfirmationInternalHtml(order, productNom)
     ),
+    sendWhatsAppConfirmation(order),
   ])
 
   return Response.json({ order: updated as Order })
