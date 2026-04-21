@@ -41,14 +41,27 @@ function formatPrice(n: number) {
   return n.toLocaleString('fr-MA') + ' MAD'
 }
 
+// Adds N business days (Mon–Fri) to a date. If the start date falls on a
+// weekend it is first pushed to the following Monday before counting.
+function addBusinessDays(from: Date, days: number): Date {
+  const d = new Date(from)
+  while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1)
+  let added = 0
+  while (added < days) {
+    d.setDate(d.getDate() + 1)
+    if (d.getDay() !== 0 && d.getDay() !== 6) added++
+  }
+  return d
+}
+
 function getDeadline(order: OrderWithProduct): { date: Date; isLate: boolean } | null {
   const created = new Date(order.created_at)
   if (order.statut === 'paiement_recu') {
-    const d = new Date(created.getTime() + 24 * 60 * 60 * 1000)
+    const d = addBusinessDays(created, 1)
     return { date: d, isLate: Date.now() > d.getTime() }
   }
   if (order.statut === 'validee') {
-    const d = new Date(created.getTime() + 48 * 60 * 60 * 1000)
+    const d = addBusinessDays(created, 2)
     return { date: d, isLate: Date.now() > d.getTime() }
   }
   return null

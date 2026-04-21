@@ -117,14 +117,9 @@ export function buildReceptionHtml(order: Order, items: { nom: string; quantite:
   </div>
 
   <!-- Footer -->
-  <div style="background:#0a0a0a;padding:24px 36px;text-align:center;">
-    <div style="margin-bottom:12px;">
-      <a href="https://wa.me/212717706550" style="display:inline-block;margin:0 10px;color:rgba(154,149,144,0.6);font-size:10px;text-decoration:none;letter-spacing:0.14em;text-transform:uppercase;">WhatsApp</a>
-      <span style="color:rgba(154,149,144,0.25);">·</span>
-      <a href="https://www.instagram.com/mamontre.ma.officiel?igsh=cnQ2ZWF1Z25kNGJ2" style="display:inline-block;margin:0 10px;color:rgba(154,149,144,0.6);font-size:10px;text-decoration:none;letter-spacing:0.14em;text-transform:uppercase;">Instagram</a>
-    </div>
-    <p style="font-size:10px;color:rgba(154,149,144,0.4);margin:0;letter-spacing:0.12em;">
-      MS-Store · D1 Milano Maroc · Casablanca
+  <div style="background:#0a0a0a;padding:20px 36px;text-align:center;">
+    <p style="font-size:10px;color:rgba(154,149,144,0.5);margin:0;letter-spacing:0.12em;">
+      MS-Store · D1 Milano · Maroc
     </p>
   </div>
 
