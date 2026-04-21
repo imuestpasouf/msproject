@@ -1,0 +1,170 @@
+{
+  "nav": {
+    "collections": "Collections",
+    "catalogue": "Catalogue",
+    "order": "Order",
+    "shop_watches": "Shop Watches",
+    "cart_aria": "Cart",
+    "home": "Home",
+    "menu_open": "Open menu",
+    "menu_close": "Close menu"
+  },
+  "lang_selector": {
+    "fr": "Français",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "banner": "Your premium watch destination in Morocco",
+  "hero": {
+    "tagline": "Milanese Design · Available in Morocco",
+    "h1_1": "Time, the way",
+    "h1_em": "Milan does it.",
+    "desc": "Watches with a sleek octagonal design, born in Milan. Exclusively available in Morocco.",
+    "cta_discover": "Discover the collection",
+    "cta_how": "How to order?",
+    "scroll": "Scroll"
+  },
+  "brand_items": [
+    "Premium Italian watches",
+    "Deferred payment up to 4x",
+    "Pay on delivery",
+    "Official warranty",
+    "National shipping coming soon"
+  ],
+  "collections_section": {
+    "tagline": "Our lines",
+    "title_plain": "The",
+    "title_em": "Collections",
+    "see_all": "View all",
+    "cards": {
+      "polycarbon_sub": "Octagonal case · Rubber",
+      "ultrathin_sub": "Ultra thin · Leather",
+      "skeleton_sub": "Exposed movement"
+    },
+    "badge_phare": "Flagship",
+    "badge_bestseller": "Bestseller",
+    "badge_premium": "Premium"
+  },
+  "lifestyle": {
+    "tagline": "The community",
+    "title_plain": "Wear",
+    "title_em": "the moment."
+  },
+  "process": {
+    "tagline": "Simple & fast",
+    "title_plain": "How to",
+    "title_em": "order?",
+    "desc": "Order online, receive at home. Pay on delivery or in installments via Alya-Pay.",
+    "steps": [
+      {
+        "title": "Choose your watch",
+        "desc": "Browse the catalogue and select the model that suits you."
+      },
+      {
+        "title": "Place your order",
+        "desc": "Enter your details and delivery address. Choose your payment method: pay on delivery (COD) or in installments via Alya."
+      },
+      {
+        "title": "Receive your watch",
+        "desc": "Your order is prepared and shipped to your address. You are notified by email at every step."
+      }
+    ]
+  },
+  "catalogue_section": {
+    "available_now": "Available now",
+    "title_plain": "Our",
+    "title_em": "Watches",
+    "all": "All",
+    "out_of_stock": "Out of stock",
+    "low_stock": "Only {n} left",
+    "quick_view": "View details"
+  },
+  "product": {
+    "home": "Home",
+    "catalogue": "Catalogue",
+    "ttc_delivery": "VAT incl. · National delivery",
+    "out_of_stock": "Out of stock",
+    "low_stock": "Only {n} left in stock",
+    "payment_note": "Confirmation by email & WhatsApp · Pay on delivery or via Alya",
+    "alert_me": "🔔 Alert me when available",
+    "back_catalogue": "← Back to catalogue",
+    "you_might_like": "You might also like",
+    "other_models_plain": "Other",
+    "other_models_em": "models",
+    "specs": {
+      "boitier": "Case size",
+      "materiau": "Case material",
+      "bracelet": "Strap",
+      "fermoir": "Clasp",
+      "lunette": "Bezel",
+      "fond": "Case back",
+      "cadran": "Dial",
+      "aiguilles": "Hands & indices",
+      "verre": "Crystal",
+      "mouvement": "Movement",
+      "resistance": "Water resistance & weight",
+      "ref": "Reference",
+      "sku": "SKU"
+    }
+  },
+  "cart": {
+    "empty": "Your cart is empty",
+    "empty_sub": "Add a watch to get started",
+    "see_catalogue": "Browse catalogue",
+    "my_cart": "My cart",
+    "n_items": "{n} items",
+    "n_item": "{n} item",
+    "clear": "Clear cart",
+    "summary": "Summary",
+    "total_ttc": "Total incl. VAT",
+    "checkout": "✦ Place Order ✦",
+    "continue_shopping": "← Continue shopping",
+    "remove_aria": "Remove"
+  },
+  "order": {
+    "tagline": "Checkout",
+    "title": "Your order",
+    "coords": "Your details",
+    "first_name": "First name",
+    "last_name": "Last name",
+    "email": "Email",
+    "phone": "Phone",
+    "delivery_address": "Delivery address",
+    "billing_address": "Billing address",
+    "billing_same": "Same as delivery address",
+    "addr_street": "Address",
+    "addr_city": "City",
+    "addr_postal": "Postal code",
+    "addr_notes": "Delivery instructions",
+    "addr_placeholder_street": "Street, number…",
+    "addr_placeholder_city": "Casablanca",
+    "addr_placeholder_postal": "20000",
+    "addr_placeholder_notes": "Floor, door code, notes…",
+    "payment_method": "Payment method",
+    "pay_cod_label": "Pay on delivery",
+    "pay_cod_desc": "You pay when you receive your order.",
+    "pay_alya_label": "Deferred payment via Alya",
+    "pay_alya_desc": "Finance your watch in installments.",
+    "submit": "✦ Confirm order ✦",
+    "submitting": "Sending…",
+    "confirmed_tagline": "Order confirmed",
+    "confirmed_title": "Thank you for your order",
+    "confirmed_ref": "Reference:",
+    "confirmed_email_sent": "A confirmation email has been sent.",
+    "confirmed_contact": "We will contact you by email & WhatsApp to confirm your order and arrange delivery.",
+    "back_catalogue": "← Back to catalogue",
+    "edit_cart": "← Edit cart",
+    "summary_prefix": "Summary ·",
+    "total_ttc": "Total incl. VAT",
+    "empty": "Your cart is empty",
+    "see_catalogue": "Browse catalogue"
+  },
+  "footer": {
+    "brand_desc": "Your premium destination in Morocco. Official distributor of D1 Milano and more.",
+    "collections": "Collections",
+    "info": "Info",
+    "contact": "Contact",
+    "info_items": ["How to order", "Store pickup", "Warranty & support"],
+    "copyright": "© 2025 MS-Store · D1 Milano Morocco"
+  }
+}

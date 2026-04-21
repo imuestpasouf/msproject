@@ -1,0 +1,170 @@
+{
+  "nav": {
+    "collections": "Collections",
+    "catalogue": "Catalogue",
+    "order": "Commander",
+    "shop_watches": "Voir les montres",
+    "cart_aria": "Panier",
+    "home": "Accueil",
+    "menu_open": "Ouvrir le menu",
+    "menu_close": "Fermer le menu"
+  },
+  "lang_selector": {
+    "fr": "Français",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "banner": "Votre référence de montres haut de gamme au Maroc",
+  "hero": {
+    "tagline": "Design Milanais · Disponible au Maroc",
+    "h1_1": "L'heure selon",
+    "h1_em": "Milan.",
+    "desc": "Des montres au design octogonal épuré, nées à Milan. Disponibles en exclusivité au Maroc.",
+    "cta_discover": "Découvrir la collection",
+    "cta_how": "Comment commander ?",
+    "scroll": "Défiler"
+  },
+  "brand_items": [
+    "Montres italiennes premium",
+    "Paiement différé jusqu'à 4X",
+    "Paiement à la livraison",
+    "Garantie officielle",
+    "Livraison nationale bientôt"
+  ],
+  "collections_section": {
+    "tagline": "Nos lignes",
+    "title_plain": "Les",
+    "title_em": "Collections",
+    "see_all": "Tout voir",
+    "cards": {
+      "polycarbon_sub": "Boîtier octogonal · Caoutchouc",
+      "ultrathin_sub": "Finesse extrême · Cuir",
+      "skeleton_sub": "Mécanisme apparent"
+    },
+    "badge_phare": "Phare",
+    "badge_bestseller": "Bestseller",
+    "badge_premium": "Premium"
+  },
+  "lifestyle": {
+    "tagline": "La communauté",
+    "title_plain": "Portez",
+    "title_em": "l'instant."
+  },
+  "process": {
+    "tagline": "Simple & rapide",
+    "title_plain": "Comment",
+    "title_em": "commander ?",
+    "desc": "Commandez en ligne, recevez chez vous. Payez à la livraison ou en plusieurs fois via Alya-Pay.",
+    "steps": [
+      {
+        "title": "Choisissez votre montre",
+        "desc": "Parcourez le catalogue et sélectionnez le modèle qui vous correspond."
+      },
+      {
+        "title": "Passez votre commande",
+        "desc": "Renseignez vos coordonnées et votre adresse de livraison. Choisissez votre mode de paiement : paiement à la livraison (COD) ou en plusieurs fois via Alya."
+      },
+      {
+        "title": "Recevez votre montre",
+        "desc": "Votre commande est préparée et expédiée à votre adresse. Vous êtes notifié par email à chaque étape."
+      }
+    ]
+  },
+  "catalogue_section": {
+    "available_now": "Disponible maintenant",
+    "title_plain": "Nos",
+    "title_em": "Montres",
+    "all": "Tout",
+    "out_of_stock": "Rupture de stock",
+    "low_stock": "Plus que {n}",
+    "quick_view": "Voir le détail"
+  },
+  "product": {
+    "home": "Accueil",
+    "catalogue": "Catalogue",
+    "ttc_delivery": "TTC · Livraison nationale",
+    "out_of_stock": "Rupture de stock",
+    "low_stock": "Plus que {n} en stock",
+    "payment_note": "Confirmation par email & WhatsApp · Paiement à la livraison ou via Alya",
+    "alert_me": "🔔 M'alerter quand disponible",
+    "back_catalogue": "← Retour au catalogue",
+    "you_might_like": "Vous aimerez aussi",
+    "other_models_plain": "Autres",
+    "other_models_em": "modèles",
+    "specs": {
+      "boitier": "Taille du boîtier",
+      "materiau": "Matériau du boîtier",
+      "bracelet": "Bracelet",
+      "fermoir": "Fermoir",
+      "lunette": "Lunette",
+      "fond": "Fond de boîtier",
+      "cadran": "Cadran",
+      "aiguilles": "Aiguilles & index",
+      "verre": "Verre",
+      "mouvement": "Mouvement",
+      "resistance": "Résistance à l'eau & poids",
+      "ref": "Référence",
+      "sku": "SKU"
+    }
+  },
+  "cart": {
+    "empty": "Votre panier est vide",
+    "empty_sub": "Ajoutez une montre pour commencer",
+    "see_catalogue": "Voir le catalogue",
+    "my_cart": "Mon panier",
+    "n_items": "{n} articles",
+    "n_item": "{n} article",
+    "clear": "Vider le panier",
+    "summary": "Récapitulatif",
+    "total_ttc": "Total TTC",
+    "checkout": "✦ Passer la commande ✦",
+    "continue_shopping": "← Continuer mes achats",
+    "remove_aria": "Supprimer"
+  },
+  "order": {
+    "tagline": "Finaliser",
+    "title": "Votre commande",
+    "coords": "Vos coordonnées",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "email": "Email",
+    "phone": "Téléphone",
+    "delivery_address": "Adresse de livraison",
+    "billing_address": "Adresse de facturation",
+    "billing_same": "Identique à l'adresse de livraison",
+    "addr_street": "Adresse",
+    "addr_city": "Ville",
+    "addr_postal": "Code postal",
+    "addr_notes": "Instructions de livraison",
+    "addr_placeholder_street": "Rue, numéro…",
+    "addr_placeholder_city": "Casablanca",
+    "addr_placeholder_postal": "20000",
+    "addr_placeholder_notes": "Étage, digicode, remarques…",
+    "payment_method": "Moyen de paiement",
+    "pay_cod_label": "Paiement à la livraison",
+    "pay_cod_desc": "Vous payez au moment de la réception.",
+    "pay_alya_label": "Paiement différé via Alya",
+    "pay_alya_desc": "Financez votre montre en plusieurs fois.",
+    "submit": "✦ Confirmer la commande ✦",
+    "submitting": "Envoi en cours…",
+    "confirmed_tagline": "Commande confirmée",
+    "confirmed_title": "Merci pour votre commande",
+    "confirmed_ref": "Référence :",
+    "confirmed_email_sent": "Un email de confirmation vous a été envoyé.",
+    "confirmed_contact": "Nous vous contacterons par email & WhatsApp pour confirmer votre commande et organiser la livraison.",
+    "back_catalogue": "← Retour au catalogue",
+    "edit_cart": "← Modifier le panier",
+    "summary_prefix": "Récapitulatif ·",
+    "total_ttc": "Total TTC",
+    "empty": "Votre panier est vide",
+    "see_catalogue": "Voir le catalogue"
+  },
+  "footer": {
+    "brand_desc": "Votre destination premium au Maroc. Distributeur officiel D1 Milano, et bien plus encore.",
+    "collections": "Collections",
+    "info": "Info",
+    "contact": "Contact",
+    "info_items": ["Comment commander", "Retrait boutique", "Garantie & SAV"],
+    "copyright": "© 2025 MS-Store · D1 Milano Maroc"
+  }
+}

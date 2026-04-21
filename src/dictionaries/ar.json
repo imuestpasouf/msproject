@@ -1,0 +1,170 @@
+{
+  "nav": {
+    "collections": "المجموعات",
+    "catalogue": "الكتالوج",
+    "order": "اطلب الآن",
+    "shop_watches": "تسوق الساعات",
+    "cart_aria": "السلة",
+    "home": "الرئيسية",
+    "menu_open": "فتح القائمة",
+    "menu_close": "إغلاق القائمة"
+  },
+  "lang_selector": {
+    "fr": "Français",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "banner": "مرجعكم في الساعات الفاخرة بالمغرب",
+  "hero": {
+    "tagline": "تصميم ميلانو · متوفر في المغرب",
+    "h1_1": "الوقت على طريقة",
+    "h1_em": "ميلانو.",
+    "desc": "ساعات بتصميم ثماني الأضلاع أنيق، صُنعت في ميلانو. متوفرة حصرياً في المغرب.",
+    "cta_discover": "اكتشف المجموعة",
+    "cta_how": "كيف تطلب؟",
+    "scroll": "تمرير"
+  },
+  "brand_items": [
+    "ساعات إيطالية فاخرة",
+    "دفع مؤجل حتى 4 أقساط",
+    "دفع عند الاستلام",
+    "ضمان رسمي",
+    "توصيل وطني قريباً"
+  ],
+  "collections_section": {
+    "tagline": "خطوطنا",
+    "title_plain": "",
+    "title_em": "المجموعات",
+    "see_all": "عرض الكل",
+    "cards": {
+      "polycarbon_sub": "علبة ثمانية الأضلاع · مطاط",
+      "ultrathin_sub": "رفيع جداً · جلد",
+      "skeleton_sub": "آلية مكشوفة"
+    },
+    "badge_phare": "رائد",
+    "badge_bestseller": "الأكثر مبيعاً",
+    "badge_premium": "بريميوم"
+  },
+  "lifestyle": {
+    "tagline": "المجتمع",
+    "title_plain": "ارتدِ",
+    "title_em": "اللحظة."
+  },
+  "process": {
+    "tagline": "بسيط وسريع",
+    "title_plain": "كيف",
+    "title_em": "تطلب؟",
+    "desc": "اطلب عبر الإنترنت، استلم في منزلك. ادفع عند الاستلام أو بالتقسيط عبر Alya-Pay.",
+    "steps": [
+      {
+        "title": "اختر ساعتك",
+        "desc": "تصفح الكتالوج واختر الموديل الذي يناسبك."
+      },
+      {
+        "title": "قدّم طلبك",
+        "desc": "أدخل بياناتك وعنوان التوصيل. اختر طريقة الدفع: عند الاستلام أو بالتقسيط عبر Alya."
+      },
+      {
+        "title": "استلم ساعتك",
+        "desc": "يتم تجهيز طلبك وشحنه إلى عنوانك. ستتلقى إشعاراً بالبريد الإلكتروني في كل خطوة."
+      }
+    ]
+  },
+  "catalogue_section": {
+    "available_now": "متوفر الآن",
+    "title_plain": "ساعاتنا",
+    "title_em": "",
+    "all": "الكل",
+    "out_of_stock": "نفد المخزون",
+    "low_stock": "بقي {n} فقط",
+    "quick_view": "عرض التفاصيل"
+  },
+  "product": {
+    "home": "الرئيسية",
+    "catalogue": "الكتالوج",
+    "ttc_delivery": "شامل الضريبة · توصيل وطني",
+    "out_of_stock": "نفد المخزون",
+    "low_stock": "بقي {n} فقط في المخزون",
+    "payment_note": "تأكيد عبر البريد الإلكتروني والواتساب · دفع عند الاستلام أو عبر Alya",
+    "alert_me": "🔔 أبلغني عند التوفر",
+    "back_catalogue": "العودة إلى الكتالوج ←",
+    "you_might_like": "قد يعجبك أيضاً",
+    "other_models_plain": "موديلات",
+    "other_models_em": "أخرى",
+    "specs": {
+      "boitier": "حجم العلبة",
+      "materiau": "مادة العلبة",
+      "bracelet": "السوار",
+      "fermoir": "المشبك",
+      "lunette": "الإطار",
+      "fond": "ظهر العلبة",
+      "cadran": "وجه الساعة",
+      "aiguilles": "العقارب والمؤشرات",
+      "verre": "الزجاج",
+      "mouvement": "الآلية",
+      "resistance": "مقاومة الماء والوزن",
+      "ref": "المرجع",
+      "sku": "SKU"
+    }
+  },
+  "cart": {
+    "empty": "سلتك فارغة",
+    "empty_sub": "أضف ساعة للبدء",
+    "see_catalogue": "تصفح الكتالوج",
+    "my_cart": "سلتي",
+    "n_items": "{n} منتجات",
+    "n_item": "{n} منتج",
+    "clear": "إفراغ السلة",
+    "summary": "ملخص الطلب",
+    "total_ttc": "المجموع شامل الضريبة",
+    "checkout": "✦ إتمام الطلب ✦",
+    "continue_shopping": "مواصلة التسوق →",
+    "remove_aria": "حذف"
+  },
+  "order": {
+    "tagline": "إتمام الطلب",
+    "title": "طلبك",
+    "coords": "معلوماتك الشخصية",
+    "first_name": "الاسم الأول",
+    "last_name": "الاسم الأخير",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "delivery_address": "عنوان التوصيل",
+    "billing_address": "عنوان الفاتورة",
+    "billing_same": "نفس عنوان التوصيل",
+    "addr_street": "العنوان",
+    "addr_city": "المدينة",
+    "addr_postal": "الرمز البريدي",
+    "addr_notes": "تعليمات التوصيل",
+    "addr_placeholder_street": "الشارع، الرقم…",
+    "addr_placeholder_city": "الدار البيضاء",
+    "addr_placeholder_postal": "20000",
+    "addr_placeholder_notes": "الطابق، الكود، الملاحظات…",
+    "payment_method": "طريقة الدفع",
+    "pay_cod_label": "الدفع عند الاستلام",
+    "pay_cod_desc": "تدفع عند استلام طلبك.",
+    "pay_alya_label": "دفع مؤجل عبر Alya",
+    "pay_alya_desc": "مولّ ساعتك على أقساط.",
+    "submit": "✦ تأكيد الطلب ✦",
+    "submitting": "جاري الإرسال…",
+    "confirmed_tagline": "تم تأكيد الطلب",
+    "confirmed_title": "شكراً لطلبك",
+    "confirmed_ref": "المرجع:",
+    "confirmed_email_sent": "تم إرسال بريد تأكيد إلكتروني.",
+    "confirmed_contact": "سنتصل بك عبر البريد والواتساب لتأكيد طلبك وترتيب التوصيل.",
+    "back_catalogue": "العودة إلى الكتالوج →",
+    "edit_cart": "تعديل السلة →",
+    "summary_prefix": "ملخص الطلب ·",
+    "total_ttc": "المجموع شامل الضريبة",
+    "empty": "سلتك فارغة",
+    "see_catalogue": "تصفح الكتالوج"
+  },
+  "footer": {
+    "brand_desc": "وجهتكم الفاخرة في المغرب. الموزع الرسمي لـ D1 Milano وأكثر.",
+    "collections": "المجموعات",
+    "info": "معلومات",
+    "contact": "التواصل",
+    "info_items": ["كيفية الطلب", "الاستلام من المتجر", "الضمان والخدمة"],
+    "copyright": "© 2025 MS-Store · D1 Milano المغرب"
+  }
+}
