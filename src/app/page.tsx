@@ -299,19 +299,19 @@ function ProcessSection() {
       num: '01',
       icon: '🔍',
       title: 'Choisissez votre montre',
-      desc: 'Parcourez le catalogue, cliquez sur le modèle qui vous correspond.',
+      desc: 'Parcourez le catalogue et sélectionnez le modèle qui vous correspond.',
     },
     {
       num: '02',
       icon: '📝',
       title: 'Passez votre commande',
-      desc: 'Remplissez le formulaire : nom, téléphone, email. Confirmation immédiate par email & WhatsApp.',
+      desc: 'Renseignez vos coordonnées et votre adresse de livraison. Choisissez votre mode de paiement : paiement à la livraison (COD) ou en plusieurs fois via Alya.',
     },
     {
       num: '03',
-      icon: '🏪',
-      title: 'Retirez en boutique',
-      desc: 'On vous contacte quand votre montre est prête. Venez la récupérer et payez sur place.',
+      icon: '📦',
+      title: 'Recevez votre montre',
+      desc: 'Votre commande est préparée et expédiée à votre adresse. Vous êtes notifié par email et WhatsApp à chaque étape.',
     },
   ]
 
@@ -327,8 +327,7 @@ function ProcessSection() {
           Comment <em className="italic text-gm">commander ?</em>
         </h2>
         <p className="text-[0.83rem] text-gd font-light leading-[1.7] mt-2.5">
-          Pas de paiement en ligne. Réservez votre montre, nous vous confirmons la disponibilité,
-          vous la récupérez en boutique.
+          Commandez en ligne, recevez chez vous. Payez à la livraison ou en plusieurs fois via Alya.
         </p>
       </div>
 

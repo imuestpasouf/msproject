@@ -185,7 +185,7 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
             </div>
           )}
           <div className="text-[0.72rem] text-gm mb-5">
-            TTC · Paiement uniquement en boutique
+            TTC · Livraison nationale
           </div>
 
           {/* ── Stock ── */}
@@ -271,8 +271,7 @@ export default async function ProduitPage(props: PageProps<'/produits/[id]'>) {
 
           <p className="text-[0.7rem] text-gm text-center leading-[1.6] mt-2">
             📱 Confirmation par{' '}
-            <strong className="text-rg">email &amp; WhatsApp</strong> · Retrait en
-            boutique · Casablanca
+            <strong className="text-rg">email &amp; WhatsApp</strong> · Paiement à la livraison ou via Alya
           </p>
         </div>
       </div>

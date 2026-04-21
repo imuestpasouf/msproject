@@ -206,7 +206,13 @@ export async function POST(req: NextRequest) {
         inserted as Order,
         emailItems.reduce((s, i) => s + i.prix_total, 0)
       ),
-    ]).catch(() => {})
+    ]).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[commande/notif-${i}]`, r.reason)
+        }
+      })
+    })
 
     return NextResponse.json({ order_ref })
   } catch (e) {
