@@ -197,7 +197,6 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
     <>
       <HeroSection image={siteImages.hero} lang={lang as Locale} t={dict} />
       <BrandStrip t={dict} />
-      <CollectionsSection products={products} lang={lang as Locale} t={dict} />
       <HomeCatalogueSection products={products} />
       <LifestyleSection images={siteImages} t={dict} />
       <ProcessSection t={dict} />

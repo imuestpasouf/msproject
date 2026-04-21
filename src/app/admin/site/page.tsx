@@ -189,10 +189,7 @@ function HeroSection({
 function BrandStrip() {
   const items = [
     'Design Milanais',
-    'Polycarbon & Ultra Thin',
-    'Retrait en boutique · Casablanca',
-    'Garantie officielle',
-    'Livraison nationale bientôt',
+    'Livraison nationale',
   ]
 
   return (
@@ -420,12 +417,7 @@ function ProcessSection() {
       title: 'Passez votre commande',
       desc: 'Remplissez le formulaire : nom, téléphone, email. Confirmation immédiate par email & WhatsApp.',
     },
-    {
-      num: '03',
-      icon: '🏪',
-      title: 'Retirez en boutique',
-      desc: 'On vous contacte quand votre montre est prête. Venez la récupérer et payez sur place.',
-    },
+
   ]
 
   return (
@@ -436,17 +428,6 @@ function ProcessSection() {
       <div className="text-center max-w-[520px] mx-auto mb-13">
         <p className="text-[0.66rem] tracking-[0.3em] uppercase text-rg font-normal mb-2.5">
           Simple & rapide
-        </p>
-        <h2
-          className="font-display font-light leading-[1.15] text-black mb-2.5"
-          style={{ fontSize: 'clamp(1.8rem, 4vw, 3rem)' }}
-        >
-          Comment{' '}
-          <em className="italic text-gm">commander ?</em>
-        </h2>
-        <p className="text-[0.83rem] text-gd font-light leading-[1.7] mt-2.5">
-          Pas de paiement en ligne. Réservez votre montre, nous vous confirmons
-          la disponibilité, vous la récupérez en boutique.
         </p>
       </div>
 

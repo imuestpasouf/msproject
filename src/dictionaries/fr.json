@@ -22,14 +22,13 @@
     "desc": "Des montres au design octogonal épuré, nées à Milan. Disponibles en exclusivité au Maroc.",
     "cta_discover": "Découvrir la collection",
     "cta_how": "Comment commander ?",
-    "scroll": "Défiler"
+    "scroll": ""
   },
   "brand_items": [
     "Montres italiennes premium",
     "Paiement différé jusqu'à 4X",
     "Paiement à la livraison",
-    "Garantie officielle",
-    "Livraison nationale bientôt"
+    "Livraison nationale"
   ],
   "collections_section": {
     "tagline": "Nos lignes",
@@ -62,7 +61,7 @@
       },
       {
         "title": "Passez votre commande",
-        "desc": "Renseignez vos coordonnées et votre adresse de livraison. Choisissez votre mode de paiement : paiement à la livraison (COD) ou en plusieurs fois via Alya."
+        "desc": "Renseignez vos coordonnées et votre adresse de livraison. Choisissez votre mode de paiement : paiement à la livraison ou en plusieurs fois via Alya."
       },
       {
         "title": "Recevez votre montre",
@@ -164,7 +163,7 @@
     "collections": "Collections",
     "info": "Info",
     "contact": "Contact",
-    "info_items": ["Comment commander", "Retrait boutique", "Garantie & SAV"],
+    "info_items": ["Comment commander", "Livraison nationale", "SAV WhatsApp & Mails"],
     "copyright": "© 2025 MS-Store · D1 Milano Maroc"
   }
 }
