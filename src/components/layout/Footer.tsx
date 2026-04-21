@@ -4,11 +4,17 @@ export default function Footer() {
       <div className="grid grid-cols-2 md:grid-cols-[2fr_1fr_1fr_1fr] gap-10 mb-10">
         {/* Brand */}
         <div>
-          <span className="font-display text-[1.3rem] font-semibold tracking-[0.12em] text-white mb-3 block">
-            D<span className="text-rg">1</span> MILANO
+          <span className="flex flex-col leading-none mb-3">
+            <span className="font-body font-semibold text-[1.1rem] tracking-[0.38em] uppercase text-white">
+              MS-STORE
+            </span>
+            <span className="font-body font-light text-[0.5rem] tracking-[0.3em] uppercase mt-[4px]"
+                  style={{ color: 'rgba(154,149,144,0.65)' }}>
+              D1 Milano
+            </span>
           </span>
           <p className="text-[0.76rem] font-light leading-[1.7] max-w-[260px]">
-            Distributeur officiel D1 Milano au Maroc. Design milanais, disponible à Casablanca.
+            Votre destination premium au Maroc. Distributeur officiel D1 Milano, et bien plus encore.
           </p>
         </div>
 
@@ -60,8 +66,8 @@ export default function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-white/10 pt-5 flex justify-between flex-wrap gap-2 text-[0.68rem] font-light">
-        <span>© 2025 D1 Milano Maroc — mamontre.ma</span>
-        <span>Designed with ♥ in Casablanca</span>
+        <span>© 2025 MS-Store · D1 Milano Maroc</span>
+        <span>Designed with ♥</span>
       </div>
     </footer>
   )

@@ -79,7 +79,10 @@ export default function HomeCatalogueSection({ products }: Props) {
           <Link
             key={product.id}
             href={`/produits/${product.id}`}
-            className="block no-underline text-black cursor-pointer group transition-transform duration-300 hover:-translate-y-1"
+            className={[
+              'block no-underline text-black cursor-pointer group transition-transform duration-300 hover:-translate-y-1',
+              product.stock === 0 ? 'opacity-60' : '',
+            ].join(' ')}
           >
             {/* Image container */}
             <div className="relative aspect-square bg-off overflow-hidden mb-3.5">
@@ -95,13 +98,33 @@ export default function HomeCatalogueSection({ products }: Props) {
                 <div className="w-full h-full bg-gl transition-transform duration-500 group-hover:scale-[1.06]" />
               )}
 
-              {/* Badge */}
-              {product.mention && (
+              {/* Badge mention */}
+              {product.mention && product.stock > 0 && (
                 <span className={[
                   'absolute top-2.5 left-2.5 text-[0.58rem] tracking-[0.14em] uppercase px-2 py-1 font-normal',
                   mentionStyle(product.mention),
                 ].join(' ')}>
                   {product.mention}
+                </span>
+              )}
+
+              {/* Out-of-stock overlay */}
+              {product.stock === 0 && (
+                <div className="absolute inset-0 flex items-center justify-center"
+                     style={{ background: 'rgba(0,0,0,0.45)' }}>
+                  <span className="text-[0.62rem] tracking-[0.2em] uppercase text-white px-3 py-1.5 border border-white/60">
+                    Rupture de stock
+                  </span>
+                </div>
+              )}
+
+              {/* Low-stock badge */}
+              {product.stock > 0 && product.stock <= 2 && (
+                <span
+                  className="absolute top-2.5 right-2.5 text-[0.58rem] tracking-[0.14em] uppercase px-2 py-1 font-normal"
+                  style={{ color: '#f97316', background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.35)' }}
+                >
+                  Plus que {product.stock}
                 </span>
               )}
 

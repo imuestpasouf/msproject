@@ -23,9 +23,9 @@ const jost = Jost({
 })
 
 export const metadata: Metadata = {
-  title: 'D1 Milano Maroc — Montres italiennes au Maroc',
+  title: 'MS-Store × D1 Milano Maroc',
   description:
-    'Distributeur officiel D1 Milano au Maroc. Montres au design octogonal épuré, nées à Milan. Disponibles en exclusivité au Maroc.',
+    'Votre destination premium au Maroc. Distributeur officiel D1 Milano — montres au design octogonal épuré, nées à Milan.',
 }
 
 export default function RootLayout({

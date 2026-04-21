@@ -13,8 +13,13 @@ export default function Navbar() {
       {/* Desktop nav */}
       <nav className="flex items-center justify-between px-12 py-[18px] backdrop-blur-[12px] border-b border-gl max-md:px-5"
            style={{ background: 'rgba(250,250,250,0.94)' }}>
-        <Link href="/" className="font-display text-[1.4rem] font-semibold tracking-[0.12em] text-black no-underline">
-          D<span className="text-rg">1</span> MILANO
+        <Link href="/" className="no-underline flex flex-col leading-none">
+          <span className="font-body font-semibold text-[1.15rem] tracking-[0.38em] uppercase text-black">
+            MS-STORE
+          </span>
+          <span className="font-body font-light text-[0.52rem] tracking-[0.32em] uppercase text-gm mt-[3px]">
+            D1 Milano
+          </span>
         </Link>
 
         <ul className="hidden md:flex gap-8 list-none">

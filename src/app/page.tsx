@@ -195,7 +195,7 @@ function CollectionsSection({ products }: { products: Product[] }) {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-2 gap-[2px] max-md:grid-cols-1">
+      <div className="grid grid-cols-3 gap-[2px] max-md:grid-cols-1">
         {cards.map((card, i) => (
           <Link
             key={card.href + i}
@@ -203,7 +203,7 @@ function CollectionsSection({ products }: { products: Product[] }) {
             className={[
               'relative overflow-hidden cursor-pointer bg-gl no-underline group',
               card.span ? 'col-span-2 max-md:col-span-1' : '',
-              card.span ? 'aspect-[16/9] max-md:aspect-[3/4]' : 'aspect-[3/4]',
+              'aspect-[16/9] max-md:aspect-[4/3]',
             ].join(' ')}
           >
             {/* Image or grey placeholder */}
@@ -213,7 +213,7 @@ function CollectionsSection({ products }: { products: Product[] }) {
                 alt={card.name}
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
-                sizes={card.span ? '100vw' : '50vw'}
+                sizes={card.span ? '66vw' : '33vw'}
               />
             ) : (
               <div className="w-full h-full bg-gl transition-transform duration-700 group-hover:scale-105" />
@@ -311,7 +311,7 @@ function ProcessSection() {
       num: '03',
       icon: '📦',
       title: 'Recevez votre montre',
-      desc: 'Votre commande est préparée et expédiée à votre adresse. Vous êtes notifié par email et WhatsApp à chaque étape.',
+      desc: 'Votre commande est préparée et expédiée à votre adresse. Vous êtes notifié par email à chaque étape.',
     },
   ]
 
@@ -327,7 +327,7 @@ function ProcessSection() {
           Comment <em className="italic text-gm">commander ?</em>
         </h2>
         <p className="text-[0.83rem] text-gd font-light leading-[1.7] mt-2.5">
-          Commandez en ligne, recevez chez vous. Payez à la livraison ou en plusieurs fois via Alya.
+          Commandez en ligne, recevez chez vous. Payez à la livraison ou en plusieurs fois via Alya-Pay.
         </p>
       </div>
 

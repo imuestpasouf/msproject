@@ -46,11 +46,11 @@ export function buildReceptionHtml(order: Order, items: { nom: string; quantite:
 
   <!-- Header -->
   <div style="background:#0a0a0a;padding:28px 36px;text-align:center;">
-    <p style="font-size:20px;font-weight:300;letter-spacing:0.14em;color:#ffffff;margin:0 0 6px;">
-      D<span style="color:#c9956c;">1</span> MILANO
+    <p style="font-size:22px;font-weight:700;letter-spacing:0.38em;text-transform:uppercase;color:#ffffff;margin:0 0 5px;font-family:'Helvetica Neue',Arial,sans-serif;">
+      MS-STORE
     </p>
-    <p style="font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:rgba(154,149,144,0.65);margin:0;">
-      Maroc
+    <p style="font-size:8px;font-weight:300;letter-spacing:0.32em;text-transform:uppercase;color:rgba(154,149,144,0.65);margin:0;font-family:'Helvetica Neue',Arial,sans-serif;">
+      D1 Milano
     </p>
   </div>
   <div style="height:3px;background:linear-gradient(90deg,#c9956c,#e8c4a8,#c9956c);"></div>
@@ -119,7 +119,7 @@ export function buildReceptionHtml(order: Order, items: { nom: string; quantite:
   <!-- Footer -->
   <div style="background:#0a0a0a;padding:20px 36px;text-align:center;">
     <p style="font-size:10px;color:rgba(154,149,144,0.5);margin:0;letter-spacing:0.12em;">
-      D1 Milano Maroc · Casablanca
+      MS-Store · D1 Milano Maroc · Casablanca
     </p>
   </div>
 

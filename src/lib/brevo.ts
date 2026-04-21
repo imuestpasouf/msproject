@@ -29,7 +29,7 @@ export async function sendEmail(
   to: string,
   subject: string,
   htmlContent: string,
-  senderName = 'Noreply-MS Store',
+  senderName = 'MS-Store',
   senderEmail = process.env.BREVO_SENDER_EMAIL!
 ): Promise<void> {
   await axios.post(
