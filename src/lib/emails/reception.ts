@@ -127,3 +127,55 @@ export function buildReceptionHtml(order: Order, items: { nom: string; quantite:
 </body>
 </html>`
 }
+
+export function buildNouvelleCommandeInternalHtml(
+  order: Order,
+  items: { nom: string; quantite: number; prix_total: number }[]
+): string {
+  const total = items.reduce((s, i) => s + i.prix_total, 0)
+  const rows = items
+    .map(
+      (i) => `<tr>
+        <td style="padding:6px 0;font-size:13px;color:#0a0a0a;">${i.nom}${i.quantite > 1 ? ` ×${i.quantite}` : ''}</td>
+        <td style="padding:6px 0;font-size:13px;color:#c9956c;text-align:right;">${i.prix_total.toLocaleString('fr-MA')} MAD</td>
+      </tr>`
+    )
+    .join('')
+
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8"><title>Nouvelle commande — ${order.order_ref}</title></head>
+<body style="margin:0;padding:24px;background:#f4f2ef;font-family:'Helvetica Neue',Arial,sans-serif;color:#0a0a0a;">
+<div style="max-width:520px;margin:0 auto;">
+
+  <div style="background:#0a0a0a;padding:18px 28px;margin-bottom:0;">
+    <p style="font-size:16px;font-weight:700;letter-spacing:0.32em;text-transform:uppercase;color:#ffffff;margin:0 0 3px;">MS-STORE</p>
+    <p style="font-size:8px;letter-spacing:0.28em;text-transform:uppercase;color:rgba(154,149,144,0.6);margin:0;">Nouvelle commande reçue</p>
+  </div>
+  <div style="height:3px;background:linear-gradient(90deg,#c9956c,#e8c4a8,#c9956c);margin-bottom:24px;"></div>
+
+  <div style="background:#ffffff;padding:28px;border:1px solid #e8e6e2;">
+    <p style="font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#c9956c;margin:0 0 6px;">Commande à traiter</p>
+    <h2 style="font-size:20px;font-weight:300;margin:0 0 20px;">N°&nbsp;${order.order_ref}</h2>
+
+    <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+      <tr><td style="padding:5px 0;font-size:12px;color:#9a9590;width:130px;">Client</td><td style="font-size:13px;">${order.client_prenom} ${order.client_nom}</td></tr>
+      <tr><td style="padding:5px 0;font-size:12px;color:#9a9590;">Téléphone</td><td style="font-size:13px;">${order.client_tel}</td></tr>
+      <tr><td style="padding:5px 0;font-size:12px;color:#9a9590;">Email</td><td style="font-size:13px;">${order.client_email}</td></tr>
+      <tr><td style="padding:5px 0;font-size:12px;color:#9a9590;">Livraison</td><td style="font-size:13px;">${order.livraison_adresse}, ${order.livraison_ville}${order.livraison_code_postal ? ' ' + order.livraison_code_postal : ''}</td></tr>
+      <tr><td style="padding:5px 0;font-size:12px;color:#9a9590;">Paiement</td><td style="font-size:13px;">${order.paiement_methode === 'livraison' ? 'À la livraison' : 'Différé via Alya'}</td></tr>
+    </table>
+
+    <div style="border-top:1px solid #e8e6e2;padding-top:16px;">
+      <p style="font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:#9a9590;margin:0 0 10px;">Articles</p>
+      <table style="width:100%;border-collapse:collapse;">${rows}</table>
+      <p style="font-size:15px;font-weight:500;text-align:right;margin:12px 0 0;color:#0a0a0a;">
+        Total : <span style="color:#c9956c;">${total.toLocaleString('fr-MA')} MAD</span>
+      </p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>`
+}

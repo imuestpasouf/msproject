@@ -70,10 +70,10 @@ export default function AdminSidebar() {
       {/* Logo */}
       <div className="px-6 py-6 border-b" style={{ borderColor: 'rgba(58,55,51,0.4)' }}>
         <Link href="/admin/dashboard" className="no-underline block">
-          <p className="font-display font-semibold tracking-[0.14em] text-white leading-none" style={{ fontSize: '1.2rem' }}>
-            D<span style={{ color: '#c9956c' }}>1</span> MILANO
+          <p className="font-body font-semibold tracking-[0.38em] uppercase text-white leading-none" style={{ fontSize: '1.1rem' }}>
+            MS-STORE
           </p>
-          <p className="text-[0.55rem] tracking-[0.3em] uppercase mt-1" style={{ color: 'rgba(154,149,144,0.6)' }}>
+          <p className="text-[0.5rem] tracking-[0.3em] uppercase mt-1" style={{ color: 'rgba(154,149,144,0.6)' }}>
             Administration
           </p>
         </Link>

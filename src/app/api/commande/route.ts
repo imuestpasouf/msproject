@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createServiceClient } from '@/lib/supabase/service'
 import { sendEmail } from '@/lib/brevo'
-import { buildReceptionHtml } from '@/lib/emails/reception'
+import { buildReceptionHtml, buildNouvelleCommandeInternalHtml } from '@/lib/emails/reception'
 import { sendWhatsAppReception } from '@/lib/whatsapp'
 import type { Order } from '@/lib/supabase/database.types'
 
@@ -201,6 +201,11 @@ export async function POST(req: NextRequest) {
         client.email,
         `Commande reçue — ${order_ref}`,
         buildReceptionHtml(inserted as Order, emailItems)
+      ),
+      sendEmail(
+        'ms.store.maroc@gmail.com',
+        `🛍 Nouvelle commande — ${order_ref}`,
+        buildNouvelleCommandeInternalHtml(inserted as Order, emailItems)
       ),
       sendWhatsAppReception(
         inserted as Order,

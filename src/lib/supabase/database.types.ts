@@ -68,6 +68,16 @@ export interface Order {
   created_at: string
 }
 
+export interface Livraison {
+  id: string
+  order_id: string
+  montant_percu: number
+  paiement_statut: 'percu' | 'partiel' | 'refuse'
+  livreur: string | null
+  notes: string | null
+  created_at: string
+}
+
 export interface SiteImage {
   id: string
   cle: string
@@ -94,6 +104,12 @@ export type Database = {
           created_at?: string
         }
         Update: Partial<Omit<Order, 'id' | 'created_at'>>
+        Relationships: []
+      }
+      livraisons: {
+        Row: Livraison
+        Insert: Omit<Livraison, 'id' | 'created_at'> & { id?: string; created_at?: string }
+        Update: Partial<Omit<Livraison, 'id' | 'created_at'>>
         Relationships: []
       }
       site_images: {

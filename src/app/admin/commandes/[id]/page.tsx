@@ -87,9 +87,15 @@ function ActionsCard({
   const [error, setError] = useState('')
   const [showCancel, setShowCancel] = useState(false)
   const [showExpedier, setShowExpedier] = useState(false)
+  const [showLivrer, setShowLivrer] = useState(false)
   const [serviceLivraison, setServiceLivraison] = useState('Cathedis')
+  const [autreServiceLivraison, setAutreServiceLivraison] = useState('')
   const [suiviNumero, setSuiviNumero] = useState('')
   const [suiviLien, setSuiviLien] = useState('')
+  const [montantPercu, setMontantPercu] = useState<string>('')
+  const [paiementStatut, setPaiementStatut] = useState<'percu' | 'partiel' | 'refuse'>('percu')
+  const [livreur, setLivreur] = useState('')
+  const [notesLivraison, setNotesLivraison] = useState('')
 
   const TERMINAL = ['livree', 'annulee', 'remboursee']
   const canCancel = !TERMINAL.includes(order.statut)
@@ -115,30 +121,32 @@ function ActionsCard({
 
   async function handleExpedier() {
     await doAction('expedier', {
-      service_livraison: serviceLivraison,
+      service_livraison: serviceLivraison === 'Autre' ? autreServiceLivraison : serviceLivraison,
       suivi_numero: suiviNumero,
       ...(suiviLien && { suivi_lien: suiviLien }),
     })
     setShowExpedier(false)
   }
 
-  async function handleLivree() {
-    setLoading('livree')
+  async function handleLivrer() {
+    if (!montantPercu) { setError('Veuillez saisir le montant perçu'); return }
+    setLoading('livrer')
     setError('')
     try {
-      const res = await fetch(`/api/admin/commandes/${order.id}`, {
-        method: 'PATCH',
+      const res = await fetch(`/api/admin/commandes/${order.id}/livrer`, {
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ statut: 'livree' }),
+        body: JSON.stringify({
+          montant_percu: parseFloat(montantPercu),
+          paiement_statut: paiementStatut,
+          ...(livreur.trim() && { livreur: livreur.trim() }),
+          ...(notesLivraison.trim() && { notes: notesLivraison.trim() }),
+        }),
       })
-      // PATCH only handles notes, so we use a direct approach
-      // Fall back: use a generic status update via valider-style endpoint if available
-      if (!res.ok) {
-        // Try updating via the main PATCH endpoint with statut override
-        setError('Utilisez la base de données pour marquer comme livrée.')
-        return
-      }
-      onUpdated({ ...order, statut: 'livree' })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error ?? 'Erreur'); return }
+      onUpdated({ ...order, ...data.order })
+      setShowLivrer(false)
     } catch {
       setError('Erreur de connexion')
     } finally {
@@ -157,7 +165,8 @@ function ActionsCard({
       <div className="flex flex-col gap-2.5">
 
         {/* ── Valider ── */}
-        {order.statut === 'paiement_recu' && (
+        {(order.statut === 'paiement_recu' ||
+          (order.statut === 'en_attente_paiement' && order.paiement_methode === 'livraison')) && (
           <button
             type="button"
             onClick={() => doAction('valider')}
@@ -210,6 +219,21 @@ function ActionsCard({
                 <option value="Autre">Autre</option>
               </select>
             </div>
+            {serviceLivraison === 'Autre' && (
+              <div>
+                <label className="block text-[0.6rem] tracking-[0.14em] uppercase mb-1" style={{ color: '#9a9590' }}>
+                  Nom du service <span style={{ color: '#ef4444' }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  value={autreServiceLivraison}
+                  onChange={(e) => setAutreServiceLivraison(e.target.value)}
+                  placeholder="ex. Quick Livraison, Tawssil…"
+                  className="w-full text-[0.78rem] px-3 py-2 bg-white border outline-none"
+                  style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#0a0a0a' }}
+                />
+              </div>
+            )}
             <div>
               <label className="block text-[0.6rem] tracking-[0.14em] uppercase mb-1" style={{ color: '#9a9590' }}>
                 Numéro de suivi <span style={{ color: '#ef4444' }}>*</span>
@@ -261,21 +285,104 @@ function ActionsCard({
         )}
 
         {/* ── Livrée ── */}
-        {order.statut === 'expediee' && (
+        {order.statut === 'expediee' && !showLivrer && (
           <button
             type="button"
-            onClick={handleLivree}
-            disabled={loading === 'livree'}
-            className="flex items-center justify-center gap-2 w-full text-[0.65rem] tracking-[0.18em] uppercase px-4 py-3 transition-colors duration-150 cursor-pointer border-none disabled:opacity-50"
+            onClick={() => { setMontantPercu(String(order.prix_total)); setShowLivrer(true) }}
+            className="flex items-center justify-center gap-2 w-full text-[0.65rem] tracking-[0.18em] uppercase px-4 py-3 transition-colors duration-150 cursor-pointer border-none"
             style={{ background: '#16a34a', color: '#fff' }}
           >
-            {loading === 'livree' ? (
-              <span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
-            ) : (
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
-            )}
-            Marquer comme livrée
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+            Confirmer la livraison
           </button>
+        )}
+
+        {/* ── Livraison form ── */}
+        {order.statut === 'expediee' && showLivrer && (
+          <div className="border rounded-sm p-4 flex flex-col gap-3" style={{ borderColor: 'rgba(22,163,74,0.3)', background: 'rgba(22,163,74,0.03)' }}>
+            <p className="text-[0.62rem] tracking-[0.18em] uppercase" style={{ color: '#16a34a' }}>
+              Confirmer la livraison
+            </p>
+
+            <div>
+              <label className="block text-[0.6rem] tracking-[0.14em] uppercase mb-1" style={{ color: '#9a9590' }}>
+                Montant perçu (MAD) <span style={{ color: '#ef4444' }}>*</span>
+              </label>
+              <input
+                type="number"
+                value={montantPercu}
+                onChange={(e) => setMontantPercu(e.target.value)}
+                className="w-full text-[0.78rem] px-3 py-2 bg-white border outline-none"
+                style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#0a0a0a' }}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[0.6rem] tracking-[0.14em] uppercase mb-1" style={{ color: '#9a9590' }}>
+                Statut du paiement
+              </label>
+              <select
+                value={paiementStatut}
+                onChange={(e) => setPaiementStatut(e.target.value as typeof paiementStatut)}
+                className="w-full text-[0.78rem] px-3 py-2 bg-white border outline-none"
+                style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#0a0a0a' }}
+              >
+                <option value="percu">Paiement reçu en totalité</option>
+                <option value="partiel">Paiement partiel</option>
+                <option value="refuse">Paiement refusé</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[0.6rem] tracking-[0.14em] uppercase mb-1" style={{ color: '#9a9590' }}>
+                Livreur <span style={{ color: 'rgba(154,149,144,0.6)', fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>optionnel</span>
+              </label>
+              <input
+                type="text"
+                value={livreur}
+                onChange={(e) => setLivreur(e.target.value)}
+                placeholder="Nom du livreur ou service"
+                className="w-full text-[0.78rem] px-3 py-2 bg-white border outline-none"
+                style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#0a0a0a' }}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[0.6rem] tracking-[0.14em] uppercase mb-1" style={{ color: '#9a9590' }}>
+                Notes <span style={{ color: 'rgba(154,149,144,0.6)', fontStyle: 'italic', textTransform: 'none', letterSpacing: 0 }}>optionnel</span>
+              </label>
+              <textarea
+                value={notesLivraison}
+                onChange={(e) => setNotesLivraison(e.target.value)}
+                rows={2}
+                placeholder="Observations sur la livraison…"
+                className="w-full text-[0.78rem] px-3 py-2 bg-white border outline-none resize-none"
+                style={{ borderColor: 'rgba(0,0,0,0.12)', color: '#0a0a0a' }}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleLivrer}
+                disabled={loading === 'livrer'}
+                className="flex-1 flex items-center justify-center gap-2 text-[0.65rem] tracking-[0.18em] uppercase px-4 py-2.5 cursor-pointer border-none disabled:opacity-50"
+                style={{ background: '#16a34a', color: '#fff' }}
+              >
+                {loading === 'livrer' ? (
+                  <span className="w-3 h-3 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                ) : 'Confirmer la livraison'}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowLivrer(false)}
+                className="px-3 py-2.5 text-[0.65rem] tracking-[0.15em] uppercase cursor-pointer bg-transparent"
+                style={{ border: '1px solid rgba(0,0,0,0.12)', color: '#9a9590' }}
+              >
+                Annuler
+              </button>
+            </div>
+          </div>
         )}
 
         {/* ── WhatsApp link ── */}

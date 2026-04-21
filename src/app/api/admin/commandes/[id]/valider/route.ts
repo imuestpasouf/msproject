@@ -42,9 +42,17 @@ export async function POST(_req: NextRequest, { params }: Ctx) {
 
   const order = orderRaw as Order
 
-  if (order.statut !== 'paiement_recu') {
+  const validableStatuts = ['paiement_recu', 'en_attente_paiement']
+  if (!validableStatuts.includes(order.statut)) {
     return Response.json(
       { error: `Impossible de valider : statut actuel "${order.statut}"` },
+      { status: 409 }
+    )
+  }
+
+  if (order.statut === 'en_attente_paiement' && order.paiement_methode !== 'livraison') {
+    return Response.json(
+      { error: 'Validation manuelle réservée aux commandes paiement à la livraison' },
       { status: 409 }
     )
   }

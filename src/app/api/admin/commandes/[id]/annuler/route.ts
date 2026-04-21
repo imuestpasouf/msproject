@@ -2,6 +2,8 @@ import { cookies } from 'next/headers'
 import type { NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import { verifySessionToken, COOKIE_NAME } from '@/lib/admin-session'
+import { sendEmail } from '@/lib/brevo'
+import { buildAnnulationHtml } from '@/lib/emails/annulation'
 import type { Order, Product } from '@/lib/supabase/database.types'
 
 type Ctx = { params: Promise<{ id: string }> }
@@ -76,6 +78,18 @@ export async function POST(_req: NextRequest, { params }: Ctx) {
     .single()
 
   if (updateErr) return Response.json({ error: updateErr.message }, { status: 500 })
+
+  // Send cancellation email (non-blocking)
+  const productNom = order.product_id
+    ? (await supabase.from('products').select('nom').eq('id', order.product_id).single())
+        .data?.nom ?? 'Montre D1 Milano'
+    : 'Montre D1 Milano'
+
+  await sendEmail(
+    order.client_email,
+    `Votre commande a été annulée — ${order.order_ref}`,
+    buildAnnulationHtml(order, productNom)
+  ).catch(() => {})
 
   return Response.json({ order: updated as Order })
 }

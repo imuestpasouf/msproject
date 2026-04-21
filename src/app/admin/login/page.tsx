@@ -21,13 +21,11 @@ export default function AdminLoginPage() {
 
           {/* Logo */}
           <div className="text-center mb-8">
-            <p
-              className="font-display font-semibold tracking-[0.14em] mb-3"
-              style={{ fontSize: '1.9rem' }}
-            >
-              D<span className="text-rg">1</span> MILANO
+            <p className="font-body font-semibold tracking-[0.38em] uppercase text-black mb-1"
+               style={{ fontSize: '1.5rem' }}>
+              MS-STORE
             </p>
-            <p className="text-[0.63rem] tracking-[0.3em] uppercase font-light text-gd">
+            <p className="text-[0.52rem] tracking-[0.3em] uppercase font-light text-gm">
               Espace Administration
             </p>
           </div>
@@ -81,14 +79,14 @@ export default function AdminLoginPage() {
 
           {/* Footer note */}
           <p className="text-center text-[0.6rem] tracking-[0.12em] text-gm mt-7">
-            Accès réservé aux administrateurs D1 Milano Maroc
+            Accès réservé aux administrateurs MS-Store
           </p>
         </div>
 
         {/* Below card */}
         <p className="text-center text-[0.6rem] tracking-[0.12em] uppercase mt-5"
            style={{ color: 'rgba(255,255,255,0.2)' }}>
-          D<span style={{ color: 'var(--color-rg)' }}>1</span> MILANO — Administration
+          MS-STORE — Administration
         </p>
       </div>
     </div>
