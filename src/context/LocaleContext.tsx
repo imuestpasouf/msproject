@@ -3,9 +3,12 @@
 import { createContext, useContext } from 'react'
 import type { Dict, Locale } from '@/lib/i18n'
 
+const BRAND_BASE = '/D1-Milano'
+
 interface LocaleContextValue {
   lang: Locale
   t: Dict
+  base: string // e.g. '/D1-Milano/fr'
 }
 
 const LocaleContext = createContext<LocaleContextValue | null>(null)
@@ -20,7 +23,7 @@ export function LocaleProvider({
   children: React.ReactNode
 }) {
   return (
-    <LocaleContext.Provider value={{ lang, t: dict }}>
+    <LocaleContext.Provider value={{ lang, t: dict, base: `${BRAND_BASE}/${lang}` }}>
       {children}
     </LocaleContext.Provider>
   )

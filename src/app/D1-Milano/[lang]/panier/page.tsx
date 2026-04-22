@@ -9,7 +9,7 @@ function formatPrice(n: number) { return n.toLocaleString('fr-MA') + ' MAD' }
 
 export default function PanierPage() {
   const { items, total, removeItem, updateQuantity, clearCart } = useCart()
-  const { lang, t } = useLocale()
+  const { t, base } = useLocale()
   const ct = t.cart
 
   const itemCount = items.reduce((s, i) => s + i.quantite, 0)
@@ -27,7 +27,7 @@ export default function PanierPage() {
           <p className="text-[1rem] font-light text-gd mb-1">{ct.empty}</p>
           <p className="text-[0.78rem] text-gm">{ct.empty_sub}</p>
         </div>
-        <Link href={`/${lang}/catalogue`} className="text-[0.72rem] tracking-[0.2em] uppercase text-white bg-black px-6 py-3.5 no-underline hover:bg-rg transition-colors duration-200">
+        <Link href={`${base}/catalogue`} className="text-[0.72rem] tracking-[0.2em] uppercase text-white bg-black px-6 py-3.5 no-underline hover:bg-rg transition-colors duration-200">
           {ct.see_catalogue}
         </Link>
       </div>
@@ -51,7 +51,7 @@ export default function PanierPage() {
           <div className="flex flex-col gap-[2px]">
             {items.map((item) => (
               <div key={item.product_id} className="bg-white flex gap-5 p-5">
-                <Link href={`/${lang}/produits/${item.product_id}`} className="flex-shrink-0">
+                <Link href={`${base}/produits/${item.product_id}`} className="flex-shrink-0">
                   <div className="bg-off overflow-hidden" style={{ width: 96, height: 96 }}>
                     {item.photo_principale ? (
                       <Image src={item.photo_principale} alt={item.nom} width={96} height={96} className="w-full h-full object-cover" />
@@ -61,7 +61,7 @@ export default function PanierPage() {
 
                 <div className="flex-1 min-w-0">
                   <p className="text-[0.6rem] tracking-[0.2em] uppercase text-rg mb-0.5">{item.collection}</p>
-                  <Link href={`/${lang}/produits/${item.product_id}`} className="no-underline">
+                  <Link href={`${base}/produits/${item.product_id}`} className="no-underline">
                     <p className="text-[0.95rem] font-light text-black leading-tight mb-0.5 hover:text-rg transition-colors">{item.nom}</p>
                   </Link>
                   <p className="text-[0.65rem] text-gm mb-3">Réf. {item.ref}</p>
@@ -118,10 +118,10 @@ export default function PanierPage() {
                 <span className="text-[0.62rem] tracking-[0.2em] uppercase text-gm">{ct.total_ttc}</span>
                 <span className="text-[1.2rem] font-light">{formatPrice(total)}</span>
               </div>
-              <Link href={`/${lang}/commande`} className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-black px-6 py-4 no-underline mb-3 transition-colors hover:bg-rg">
+              <Link href={`${base}/commande`} className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-black px-6 py-4 no-underline mb-3 transition-colors hover:bg-rg">
                 {ct.checkout}
               </Link>
-              <Link href={`/${lang}/catalogue`} className="block text-center text-[0.68rem] tracking-[0.16em] uppercase text-gm py-2 no-underline hover:text-black transition-colors">
+              <Link href={`${base}/catalogue`} className="block text-center text-[0.68rem] tracking-[0.16em] uppercase text-gm py-2 no-underline hover:text-black transition-colors">
                 {ct.continue_shopping}
               </Link>
             </div>

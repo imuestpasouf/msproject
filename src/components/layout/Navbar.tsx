@@ -12,14 +12,14 @@ const LOCALES: Locale[] = ['fr', 'en', 'ar']
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const { count, openDrawer } = useCart()
-  const { lang, t } = useLocale()
+  const { lang, t, base } = useLocale()
   const pathname = usePathname()
   const router = useRouter()
 
   function switchLang(newLang: Locale) {
-    // Replace the locale segment in the current path
+    // Path: /D1-Milano/{lang}/{...rest} — lang is at index 2
     const segments = pathname.split('/')
-    segments[1] = newLang
+    segments[2] = newLang
     document.cookie = `locale=${newLang};path=/;max-age=31536000;samesite=lax`
     router.push(segments.join('/'))
   }
@@ -29,24 +29,24 @@ export default function Navbar() {
       {/* Desktop nav */}
       <nav className="flex items-center justify-between px-12 py-[18px] backdrop-blur-[12px] border-b border-gl max-md:px-5"
            style={{ background: 'rgba(250,250,250,0.94)' }}>
-        <Link href={`/${lang}`} className="no-underline flex flex-col leading-none">
+        <Link href={base} className="no-underline flex flex-col leading-none">
           <span className="font-body font-semibold text-[1.15rem] tracking-[0.38em] uppercase text-black">MS-STORE</span>
           <span className="font-body font-light text-[0.52rem] tracking-[0.32em] uppercase text-gm mt-[3px]">D1 Milano</span>
         </Link>
 
         <ul className="hidden md:flex gap-8 list-none">
           <li>
-            <Link href={`/${lang}/#collections`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
+            <Link href={`${base}/#collections`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
               {t.nav.collections}
             </Link>
           </li>
           <li>
-            <Link href={`/${lang}/catalogue`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
+            <Link href={`${base}/catalogue`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
               {t.nav.catalogue}
             </Link>
           </li>
           <li>
-            <Link href={`/${lang}/#process`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
+            <Link href={`${base}/#process`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
               {t.nav.order}
             </Link>
           </li>
@@ -89,7 +89,7 @@ export default function Navbar() {
               </span>
             )}
           </button>
-          <Link href={`/${lang}/catalogue`}
+          <Link href={`${base}/catalogue`}
             className="text-[0.7rem] tracking-[0.16em] uppercase font-normal text-white bg-black px-[22px] py-[10px] no-underline hover:bg-rg transition-colors duration-200">
             {t.nav.shop_watches}
           </Link>
@@ -117,15 +117,15 @@ export default function Navbar() {
           >
             ✕
           </button>
-          <Link href={`/${lang}`} className="font-display text-[2rem] font-light text-black no-underline tracking-[0.08em] hover:text-rg"
+          <Link href={base} className="font-display text-[2rem] font-light text-black no-underline tracking-[0.08em] hover:text-rg"
             onClick={() => setMobileOpen(false)}>
             {t.nav.home}
           </Link>
-          <Link href={`/${lang}/catalogue`} className="font-display text-[2rem] font-light text-black no-underline tracking-[0.08em] hover:text-rg"
+          <Link href={`${base}/catalogue`} className="font-display text-[2rem] font-light text-black no-underline tracking-[0.08em] hover:text-rg"
             onClick={() => setMobileOpen(false)}>
             {t.nav.catalogue}
           </Link>
-          <Link href={`/${lang}/#process`} className="font-display text-[2rem] font-light text-black no-underline tracking-[0.08em] hover:text-rg"
+          <Link href={`${base}/#process`} className="font-display text-[2rem] font-light text-black no-underline tracking-[0.08em] hover:text-rg"
             onClick={() => setMobileOpen(false)}>
             {t.nav.order}
           </Link>

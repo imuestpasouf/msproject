@@ -48,7 +48,7 @@ export default function Footer() {
             <li className="text-[0.76rem] font-light transition-colors duration-200 hover:text-rgl">
               <a href="https://www.instagram.com/mamontre.ma.officiel?igsh=cnQ2ZWF1Z25kNGJ2" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit">Instagram</a>
             </li>
-            <li className="text-[0.76rem] font-light" style={{ color: 'rgba(255,255,255,0.55)' }}>Casablanca, Maroc</li>
+            <li className="text-[0.76rem] font-light" style={{ color: 'rgba(255,255,255,0.55)' }}>Maroc</li>
           </ul>
         </div>
       </div>

@@ -22,7 +22,7 @@ const labelClass = 'block text-[0.62rem] tracking-[0.2em] uppercase text-gm mb-1
 
 export default function CommandePage() {
   const { items, total, clearCart } = useCart()
-  const { lang, t } = useLocale()
+  const { t, base } = useLocale()
   const ot = t.order
 
   const [form, setForm] = useState<FormData>({
@@ -38,7 +38,7 @@ export default function CommandePage() {
     return (
       <div className="pt-[80px] min-h-screen flex flex-col items-center justify-center gap-6 px-6 text-center">
         <p className="text-[1rem] font-light text-gd">{ot.empty}</p>
-        <Link href={`/${lang}/catalogue`} className="text-[0.72rem] tracking-[0.2em] uppercase text-white bg-black px-6 py-3.5 no-underline hover:bg-rg transition-colors duration-200">
+        <Link href={`${base}/catalogue`} className="text-[0.72rem] tracking-[0.2em] uppercase text-white bg-black px-6 py-3.5 no-underline hover:bg-rg transition-colors duration-200">
           {ot.see_catalogue}
         </Link>
       </div>
@@ -68,7 +68,7 @@ export default function CommandePage() {
             📱 {ot.confirmed_contact}
           </p>
         </div>
-        <Link href={`/${lang}/catalogue`} className="text-[0.68rem] tracking-[0.18em] uppercase text-gm no-underline hover:text-black transition-colors">
+        <Link href={`${base}/catalogue`} className="text-[0.68rem] tracking-[0.18em] uppercase text-gm no-underline hover:text-black transition-colors">
           {ot.back_catalogue}
         </Link>
       </div>
@@ -242,7 +242,7 @@ export default function CommandePage() {
               </div>
             </div>
             <div className="bg-white p-4 text-center">
-              <Link href={`/${lang}/panier`} className="text-[0.65rem] tracking-[0.14em] uppercase text-gm no-underline hover:text-black transition-colors">
+              <Link href={`${base}/panier`} className="text-[0.65rem] tracking-[0.14em] uppercase text-gm no-underline hover:text-black transition-colors">
                 {ot.edit_cart}
               </Link>
             </div>

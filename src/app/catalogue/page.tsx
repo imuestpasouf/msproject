@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
 
 export default function CatalogueRedirect() {
-  redirect('/fr/catalogue')
+  redirect('/D1-Milano/fr/catalogue')
 }

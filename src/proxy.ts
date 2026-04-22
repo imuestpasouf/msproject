@@ -3,6 +3,12 @@ import { verifySessionToken, COOKIE_NAME } from '@/lib/admin-session'
 
 const LOCALES = ['fr', 'en', 'ar'] as const
 const DEFAULT_LOCALE = 'fr'
+const BRAND = '/D1-Milano'
+
+function getLocaleFromCookie(request: NextRequest): string {
+  const cookie = request.cookies.get('locale')?.value ?? DEFAULT_LOCALE
+  return (LOCALES as readonly string[]).includes(cookie) ? cookie : DEFAULT_LOCALE
+}
 
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -17,21 +23,41 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // ── Locale redirect ───────────────────────────────────────────────────────
-  // If path already has a locale prefix, just update the cookie and pass through
+  // ── Brand routes: /D1-Milano/... ──────────────────────────────────────────
+  if (pathname.startsWith(BRAND)) {
+    const afterBrand = pathname.slice(BRAND.length) // e.g. '/fr/catalogue' or '' or '/'
+    const subSegment = afterBrand.split('/')[1]      // e.g. 'fr', 'en', 'ar', or ''
+
+    if ((LOCALES as readonly string[]).includes(subSegment)) {
+      // Valid locale present — pass through and refresh cookie
+      const res = NextResponse.next()
+      res.cookies.set('locale', subSegment, { path: '/', maxAge: 365 * 24 * 3600, sameSite: 'lax' })
+      return res
+    }
+
+    // /D1-Milano with no locale — redirect to /D1-Milano/{locale}{rest}
+    const locale = getLocaleFromCookie(request)
+    const rest = afterBrand === '' || afterBrand === '/' ? '' : afterBrand
+    request.nextUrl.pathname = `${BRAND}/${locale}${rest}`
+    const res = NextResponse.redirect(request.nextUrl)
+    res.cookies.set('locale', locale, { path: '/', maxAge: 365 * 24 * 3600, sameSite: 'lax' })
+    return res
+  }
+
+  // ── Legacy locale-prefixed paths (/fr/..., /en/..., /ar/...) ─────────────
   const firstSegment = pathname.split('/')[1]
   if ((LOCALES as readonly string[]).includes(firstSegment)) {
-    const res = NextResponse.next()
+    const res = NextResponse.redirect(new URL(`${BRAND}${pathname}`, request.url))
     res.cookies.set('locale', firstSegment, { path: '/', maxAge: 365 * 24 * 3600, sameSite: 'lax' })
     return res
   }
 
-  // No locale prefix — detect and redirect
-  const locale = request.cookies.get('locale')?.value ?? DEFAULT_LOCALE
-  const validLocale = (LOCALES as readonly string[]).includes(locale) ? locale : DEFAULT_LOCALE
-  request.nextUrl.pathname = `/${validLocale}${pathname}`
+  // ── Everything else (/, /catalogue, etc.) → redirect to brand home ────────
+  const locale = getLocaleFromCookie(request)
+  const dest = pathname === '/' ? BRAND : `${BRAND}/${locale}${pathname}`
+  request.nextUrl.pathname = dest.replace(/\/+/g, '/')
   const res = NextResponse.redirect(request.nextUrl)
-  res.cookies.set('locale', validLocale, { path: '/', maxAge: 365 * 24 * 3600, sameSite: 'lax' })
+  res.cookies.set('locale', locale, { path: '/', maxAge: 365 * 24 * 3600, sameSite: 'lax' })
   return res
 }
 

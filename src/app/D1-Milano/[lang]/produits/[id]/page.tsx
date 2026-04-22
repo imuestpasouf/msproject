@@ -76,15 +76,16 @@ export default async function ProduitPage({ params }: { params: Promise<{ lang: 
   const specs = buildSpecs(product, dict.product.specs)
   const hasReduc = !!product.reduction && !!product.prix_reduc
   const t = dict.product
+  const base = `/D1-Milano/${lang}`
 
   return (
     <div className="pt-[80px] min-h-screen">
 
       {/* Breadcrumb */}
       <div className="px-12 py-5 text-[0.68rem] tracking-[0.12em] text-gm max-md:px-6">
-        <Link href={`/${lang}`} className="text-gm no-underline hover:text-rg">{t.home}</Link>
+        <Link href={base} className="text-gm no-underline hover:text-rg">{t.home}</Link>
         <span className="mx-2">›</span>
-        <Link href={`/${lang}/catalogue`} className="text-gm no-underline hover:text-rg">{t.catalogue}</Link>
+        <Link href={`${base}/catalogue`} className="text-gm no-underline hover:text-rg">{t.catalogue}</Link>
         <span className="mx-2">›</span>
         <span>{product.nom}</span>
       </div>
@@ -152,7 +153,7 @@ export default async function ProduitPage({ params }: { params: Promise<{ lang: 
 
           <div className="flex flex-col gap-3">
             {product.stock === 0 ? (
-              <Link href={`/${lang}/alerter?id=${product.id}`}
+              <Link href={`${base}/alerter?id=${product.id}`}
                 className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-gd px-[30px] py-[17px] no-underline transition-colors duration-200 hover:bg-black">
                 {t.alert_me}
               </Link>
@@ -164,7 +165,7 @@ export default async function ProduitPage({ params }: { params: Promise<{ lang: 
                 reduction: product.reduction, stock: product.stock,
               }} />
             )}
-            <Link href={`/${lang}/catalogue`}
+            <Link href={`${base}/catalogue`}
               className="block text-center text-[0.72rem] tracking-[0.2em] uppercase font-light text-black border border-black px-[28px] py-[13px] no-underline transition-all duration-200 hover:bg-black hover:text-white">
               {t.back_catalogue}
             </Link>
@@ -185,7 +186,7 @@ export default async function ProduitPage({ params }: { params: Promise<{ lang: 
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-5 max-md:gap-3">
             {related.map((rel) => (
-              <Link key={rel.id} href={`/${lang}/produits/${rel.id}`} className="block no-underline text-black cursor-pointer group transition-transform duration-300 hover:-translate-y-1">
+              <Link key={rel.id} href={`${base}/produits/${rel.id}`} className="block no-underline text-black cursor-pointer group transition-transform duration-300 hover:-translate-y-1">
                 <div className="relative aspect-square bg-off overflow-hidden mb-3.5">
                   {rel.photo_principale ? (
                     <Image src={rel.photo_principale} alt={rel.nom} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.06]" sizes="(max-width: 768px) 50vw, 33vw" />

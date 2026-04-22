@@ -23,7 +23,7 @@ function mentionStyle(mention: string | null): string {
 
 export default function HomeCatalogueSection({ products }: { products: Product[] }) {
   const [active, setActive] = useState('all')
-  const { lang, t } = useLocale()
+  const { t, base } = useLocale()
   const cs = t.catalogue_section
 
   const FILTERS = [
@@ -61,7 +61,7 @@ export default function HomeCatalogueSection({ products }: { products: Product[]
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-md:gap-3.5">
         {visible.map((product) => (
-          <Link key={product.id} href={`/${lang}/produits/${product.id}`}
+          <Link key={product.id} href={`${base}/produits/${product.id}`}
             className={['block no-underline text-black cursor-pointer group transition-transform duration-300 hover:-translate-y-1', product.stock === 0 ? 'opacity-60' : ''].join(' ')}>
             <div className="relative aspect-square bg-off overflow-hidden mb-3.5">
               {product.photo_principale ? (

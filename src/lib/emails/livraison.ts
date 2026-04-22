@@ -82,7 +82,7 @@ export function buildLivraisonHtml(order: Order, livraison: Livraison, productNo
       <a href="https://www.instagram.com/mamontre.ma.officiel?igsh=cnQ2ZWF1Z25kNGJ2" style="display:inline-block;margin:0 10px;color:rgba(154,149,144,0.6);font-size:10px;text-decoration:none;letter-spacing:0.14em;text-transform:uppercase;">Instagram</a>
     </div>
     <p style="font-size:10px;color:rgba(154,149,144,0.4);margin:0;letter-spacing:0.12em;">
-      MS-Store · D1 Milano Maroc · Casablanca
+      MS-Store · D1 Milano · Maroc
     </p>
   </div>
 
