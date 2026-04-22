@@ -112,7 +112,7 @@ export function buildReceptionHtml(order: Order, items: { nom: string; quantite:
     <div style="height:1px;background:#e8e6e2;margin-bottom:24px;"></div>
 
     <p style="font-size:12px;font-weight:300;line-height:1.75;color:#9a9590;margin:0;">
-      Pour toute question, contactez-nous sur WhatsApp ou répondez à cet email.
+      Contactez-nous sur <a href="https://wa.me/212717706550" style="color:#9a9590;">WhatsApp</a> ou <a href="mailto:contact@ms-store.ma" style="color:#9a9590;">par mail</a>.
     </p>
   </div>
 
