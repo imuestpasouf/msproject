@@ -46,7 +46,7 @@ export default function Footer() {
               <a href="https://wa.me/212717706550" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit">WhatsApp</a>
             </li>
             <li className="text-[0.76rem] font-light transition-colors duration-200 hover:text-rgl">
-              <a href="https://www.instagram.com/mamontre.ma.officiel?igsh=cnQ2ZWF1Z25kNGJ2" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit">Instagram</a>
+              <a href="https://www.instagram.com/ms.store.d1milano" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit">Instagram</a>
             </li>
             <li className="text-[0.76rem] font-light" style={{ color: 'rgba(255,255,255,0.55)' }}>Maroc</li>
           </ul>
@@ -59,7 +59,7 @@ export default function Footer() {
         <div className="flex items-center gap-4">
           <a href="https://wa.me/212717706550" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit hover:text-rgl transition-colors">WhatsApp</a>
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
-          <a href="https://www.instagram.com/mamontre.ma.officiel?igsh=cnQ2ZWF1Z25kNGJ2" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit hover:text-rgl transition-colors">Instagram</a>
+          <a href="https://www.instagram.com/ms.store.d1milano" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit hover:text-rgl transition-colors">Instagram</a>
         </div>
       </div>
     </footer>

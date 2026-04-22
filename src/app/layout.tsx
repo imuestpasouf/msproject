@@ -23,6 +23,9 @@ export const metadata: Metadata = {
   title: 'MS-Store × D1 Milano Maroc',
   description:
     'Votre destination premium au Maroc. Distributeur officiel D1 Milano — montres au design octogonal épuré, nées à Milan.',
+  icons: {
+    icon: '/ms-icon.svg',
+  },
 }
 
 export default async function RootLayout({

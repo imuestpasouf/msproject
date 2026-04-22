@@ -13,8 +13,7 @@ export default function ProductGallery({ images, name }: Props) {
 
   return (
     <div
-      className="bg-off flex flex-col p-8 gap-4 max-md:relative max-md:top-0 max-md:h-[420px]"
-      style={{ position: 'sticky', top: '80px', height: 'calc(100vh - 80px)' }}
+      className="bg-off flex flex-col p-8 gap-4 h-[420px] md:sticky md:top-[80px] md:h-[calc(100vh-80px)]"
     >
       {/* Main image */}
       <div className="flex-1 flex items-center justify-center overflow-hidden">

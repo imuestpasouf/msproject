@@ -96,7 +96,7 @@ function LifestyleSection({ images, t }: { images: SiteImages; t: Dict }) {
             {t.lifestyle.title_plain} <em className="italic" style={{ color: 'var(--color-rgl)' }}>{t.lifestyle.title_em}</em>
           </h2>
         </div>
-        <a href="https://www.instagram.com/mamontre.ma.officiel?igsh=cnQ2ZWF1Z25kNGJ2" target="_blank" rel="noopener noreferrer"
+        <a href="https://www.instagram.com/ms.store.d1milano" target="_blank" rel="noopener noreferrer"
           className="text-[0.72rem] tracking-[0.18em] uppercase no-underline pb-[2px]"
           style={{ color: 'rgba(255,255,255,0.45)', borderBottom: '1px solid rgba(255,255,255,0.25)' }}>
           @mamontre.ma
