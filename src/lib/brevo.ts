@@ -29,8 +29,8 @@ export async function sendEmail(
   to: string,
   subject: string,
   htmlContent: string,
-  senderName = 'MS-Store',
-  senderEmail = process.env.BREVO_SENDER_EMAIL!
+  senderName = 'MS Store',
+  senderEmail = 'no-reply@ms-store.ma'
 ): Promise<void> {
   await axios.post(
     BREVO_API_URL,

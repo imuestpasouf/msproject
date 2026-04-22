@@ -68,11 +68,18 @@ export default function HomeCatalogueSection({ products }: { products: Product[]
                 <Image src={product.photo_principale} alt={product.nom} fill className="object-cover transition-transform duration-500 group-hover:scale-[1.06]" sizes="(max-width: 768px) 50vw, 25vw" />
               ) : <div className="w-full h-full bg-gl transition-transform duration-500 group-hover:scale-[1.06]" />}
 
-              {product.mention && product.stock > 0 && (
-                <span className={['absolute top-2.5 left-2.5 text-[0.58rem] tracking-[0.14em] uppercase px-2 py-1 font-normal', mentionStyle(product.mention)].join(' ')}>
-                  {product.mention}
+              {/* Top badges — flex container prevents overlap on mobile */}
+              <div className="absolute top-2.5 left-2.5 right-2.5 flex justify-between items-start gap-1 pointer-events-none">
+                <span className={['text-[0.58rem] tracking-[0.14em] uppercase px-2 py-1 font-normal', product.mention && product.stock > 0 ? mentionStyle(product.mention) : 'invisible'].join(' ')}>
+                  {product.mention ?? ''}
                 </span>
-              )}
+                {product.stock > 0 && product.stock <= 2 && (
+                  <span className="text-[0.58rem] tracking-[0.14em] uppercase px-2 py-1 font-normal shrink-0"
+                    style={{ color: '#f97316', background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.35)' }}>
+                    {cs.low_stock.replace('{n}', String(product.stock))}
+                  </span>
+                )}
+              </div>
 
               {product.stock === 0 && (
                 <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.45)' }}>
@@ -80,13 +87,6 @@ export default function HomeCatalogueSection({ products }: { products: Product[]
                     {cs.out_of_stock}
                   </span>
                 </div>
-              )}
-
-              {product.stock > 0 && product.stock <= 2 && (
-                <span className="absolute top-2.5 right-2.5 text-[0.58rem] tracking-[0.14em] uppercase px-2 py-1 font-normal"
-                  style={{ color: '#f97316', background: 'rgba(249,115,22,0.12)', border: '1px solid rgba(249,115,22,0.35)' }}>
-                  {cs.low_stock.replace('{n}', String(product.stock))}
-                </span>
               )}
 
               <div className="absolute bottom-0 left-0 right-0 bg-black text-white text-center py-3 text-[0.68rem] tracking-[0.16em] uppercase translate-y-full transition-transform duration-300 group-hover:translate-y-0">

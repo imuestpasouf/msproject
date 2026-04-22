@@ -18,15 +18,6 @@ export default function Footer() {
           <p className="text-[0.76rem] font-light leading-[1.7] max-w-[260px]">{ft.brand_desc}</p>
         </div>
 
-        {/* Collections */}
-        <div>
-          <h4 className="text-[0.65rem] tracking-[0.25em] uppercase text-white font-normal mb-3.5">{ft.collections}</h4>
-          <ul className="list-none space-y-[9px]">
-            {['Polycarbon', 'Ultra Thin', 'Skeleton', 'Tahoe'].map((item) => (
-              <li key={item} className="text-[0.76rem] font-light cursor-pointer transition-colors duration-200 hover:text-rgl">{item}</li>
-            ))}
-          </ul>
-        </div>
 
         {/* Info */}
         <div>
@@ -48,7 +39,7 @@ export default function Footer() {
             <li className="text-[0.76rem] font-light transition-colors duration-200 hover:text-rgl">
               <a href="https://www.instagram.com/ms.store.d1milano" target="_blank" rel="noopener noreferrer" className="no-underline text-inherit">Instagram</a>
             </li>
-            <li className="text-[0.76rem] font-light" style={{ color: 'rgba(255,255,255,0.55)' }}>Maroc</li>
+            <li className="text-[0.76rem] font-light" style={{ color: 'rgba(255,255,255,0.55)' }}></li>
           </ul>
         </div>
       </div>
