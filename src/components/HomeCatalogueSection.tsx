@@ -98,8 +98,20 @@ export default function HomeCatalogueSection({ products }: { products: Product[]
             <div className="font-display text-[1.1rem] font-normal mb-0.5">{product.nom}</div>
             <div className="text-[0.65rem] text-gm tracking-[0.08em] mb-2">Réf. {product.ref}</div>
             <div className="text-[0.92rem] font-normal tracking-[0.04em]">
-              {formatPrice(product.prix_reduc ?? product.prix)}{' '}
-              <span className="text-[0.68rem] text-gm">TTC</span>
+              {product.prix_reduc != null ? (
+                <span className="flex items-baseline gap-2 flex-wrap">
+                  <span>
+                    {formatPrice(product.prix_reduc)}{' '}
+                    <span className="text-[0.68rem] text-gm">TTC</span>
+                  </span>
+                  <span className="text-[0.72rem] text-gm line-through">{formatPrice(product.prix)}</span>
+                </span>
+              ) : (
+                <>
+                  {formatPrice(product.prix)}{' '}
+                  <span className="text-[0.68rem] text-gm">TTC</span>
+                </>
+              )}
             </div>
           </Link>
         ))}

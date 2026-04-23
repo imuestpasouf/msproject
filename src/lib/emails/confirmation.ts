@@ -87,7 +87,7 @@ export function buildConfirmationHtml(order: Order, productNom: string): string 
   <!-- Footer -->
   <div style="background:#0a0a0a;padding:20px 36px;text-align:center;">
     <p style="font-size:10px;color:rgba(154,149,144,0.5);margin:0;letter-spacing:0.12em;">
-      MS-Store · D1 Milano Maroc · Casablanca
+      MS-Store · D1 Milano · Maroc
     </p>
   </div>
 
