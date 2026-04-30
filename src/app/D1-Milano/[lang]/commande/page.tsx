@@ -20,6 +20,37 @@ const emptyAdresse = (): AdresseForm => ({ adresse: '', ville: '', code_postal: 
 const inputClass = 'w-full border border-gl bg-transparent px-4 py-3 text-[0.85rem] font-light text-black placeholder:text-gm focus:outline-none focus:border-black transition-colors'
 const labelClass = 'block text-[0.62rem] tracking-[0.2em] uppercase text-gm mb-1.5'
 
+function AdresseSection({ prefix, value, onChange, ot }: {
+  prefix: string
+  value: AdresseForm
+  onChange: (v: AdresseForm) => void
+  ot: { addr_street: string; addr_placeholder_street: string; addr_city: string; addr_placeholder_city: string; addr_postal: string; addr_placeholder_postal: string; addr_notes: string; addr_placeholder_notes: string }
+}) {
+  const set = (key: keyof AdresseForm) => (v: string) => onChange({ ...value, [key]: v })
+  return (
+    <div className="flex flex-col gap-4">
+      <div>
+        <label htmlFor={`${prefix}_adresse`} className={labelClass}>{ot.addr_street} *</label>
+        <input id={`${prefix}_adresse`} type="text" required placeholder={ot.addr_placeholder_street} value={value.adresse} onChange={(e) => set('adresse')(e.target.value)} className={inputClass} />
+      </div>
+      <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
+        <div>
+          <label htmlFor={`${prefix}_ville`} className={labelClass}>{ot.addr_city} *</label>
+          <input id={`${prefix}_ville`} type="text" required placeholder={ot.addr_placeholder_city} value={value.ville} onChange={(e) => set('ville')(e.target.value)} className={inputClass} />
+        </div>
+        <div>
+          <label htmlFor={`${prefix}_cp`} className={labelClass}>{ot.addr_postal}</label>
+          <input id={`${prefix}_cp`} type="text" placeholder={ot.addr_placeholder_postal} value={value.code_postal} onChange={(e) => set('code_postal')(e.target.value)} className={inputClass} />
+        </div>
+      </div>
+      <div>
+        <label htmlFor={`${prefix}_instructions`} className={labelClass}>{ot.addr_notes}</label>
+        <textarea id={`${prefix}_instructions`} rows={2} placeholder={ot.addr_placeholder_notes} value={value.instructions} onChange={(e) => onChange({ ...value, instructions: e.target.value })} className={inputClass + ' resize-none'} />
+      </div>
+    </div>
+  )
+}
+
 export default function CommandePage() {
   const { items, total, clearCart } = useCart()
   const { t, base } = useLocale()
@@ -103,32 +134,6 @@ export default function CommandePage() {
   const setField = (key: keyof Pick<FormData, 'prenom' | 'nom' | 'email' | 'tel'>) =>
     (v: string) => setForm((f) => ({ ...f, [key]: v }))
 
-  function AdresseSection({ prefix, value, onChange }: { prefix: string; value: AdresseForm; onChange: (v: AdresseForm) => void }) {
-    const set = (key: keyof AdresseForm) => (v: string) => onChange({ ...value, [key]: v })
-    return (
-      <div className="flex flex-col gap-4">
-        <div>
-          <label htmlFor={`${prefix}_adresse`} className={labelClass}>{ot.addr_street} *</label>
-          <input id={`${prefix}_adresse`} type="text" required placeholder={ot.addr_placeholder_street} value={value.adresse} onChange={(e) => set('adresse')(e.target.value)} className={inputClass} />
-        </div>
-        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
-          <div>
-            <label htmlFor={`${prefix}_ville`} className={labelClass}>{ot.addr_city} *</label>
-            <input id={`${prefix}_ville`} type="text" required placeholder={ot.addr_placeholder_city} value={value.ville} onChange={(e) => set('ville')(e.target.value)} className={inputClass} />
-          </div>
-          <div>
-            <label htmlFor={`${prefix}_cp`} className={labelClass}>{ot.addr_postal}</label>
-            <input id={`${prefix}_cp`} type="text" placeholder={ot.addr_placeholder_postal} value={value.code_postal} onChange={(e) => set('code_postal')(e.target.value)} className={inputClass} />
-          </div>
-        </div>
-        <div>
-          <label htmlFor={`${prefix}_instructions`} className={labelClass}>{ot.addr_notes}</label>
-          <textarea id={`${prefix}_instructions`} rows={2} placeholder={ot.addr_placeholder_notes} value={value.instructions} onChange={(e) => onChange({ ...value, instructions: e.target.value })} className={inputClass + ' resize-none'} />
-        </div>
-      </div>
-    )
-  }
-
   const itemCount = items.reduce((s, i) => s + i.quantite, 0)
 
   return (
@@ -168,7 +173,7 @@ export default function CommandePage() {
 
             <div className="bg-white p-6">
               <p className="text-[0.6rem] tracking-[0.25em] uppercase text-gm mb-6">{ot.delivery_address}</p>
-              <AdresseSection prefix="livraison" value={form.livraison} onChange={(v) => setForm((f) => ({ ...f, livraison: v }))} />
+              <AdresseSection prefix="livraison" value={form.livraison} onChange={(v) => setForm((f) => ({ ...f, livraison: v }))} ot={ot} />
             </div>
 
             <div className="bg-white p-6">
@@ -178,7 +183,7 @@ export default function CommandePage() {
                 <span className="text-[0.78rem] font-light text-gd">{ot.billing_same}</span>
               </label>
               {!form.facturation_identique && (
-                <AdresseSection prefix="facturation" value={form.facturation} onChange={(v) => setForm((f) => ({ ...f, facturation: v }))} />
+                <AdresseSection prefix="facturation" value={form.facturation} onChange={(v) => setForm((f) => ({ ...f, facturation: v }))} ot={ot} />
               )}
             </div>
 
