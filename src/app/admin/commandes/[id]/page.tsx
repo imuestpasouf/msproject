@@ -648,43 +648,61 @@ export default function CommandeDetailPage({
 
                 {/* Order detail */}
                 <Card title="Détail de la commande">
-                  <div className="flex gap-5 items-start">
-                    {/* Product photo */}
-                    <div className="flex-shrink-0 w-20 h-20 bg-off overflow-hidden">
-                      {order.product?.photo_principale ? (
-                        <Image
-                          src={order.product.photo_principale}
-                          alt={order.product.nom}
-                          width={80}
-                          height={80}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gl flex items-center justify-center">
-                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'rgba(0,0,0,0.2)' }}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  {/* Articles — JSONB (nouvelles commandes) ou produit unique (anciens) */}
+                  {order.items?.length > 0 ? (
+                    <div className="flex flex-col divide-y" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className="flex gap-4 items-center py-3 first:pt-0 last:pb-0">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[0.85rem] font-light" style={{ color: '#0a0a0a' }}>{item.nom}</p>
+                            <p className="text-[0.7rem]" style={{ color: '#9a9590' }}>Réf. {item.ref} · ×{item.quantite}</p>
+                          </div>
+                          <p className="text-[0.9rem] font-light flex-shrink-0" style={{ color: '#c9956c' }}>
+                            {formatPrice(item.prix_total)}
+                          </p>
                         </div>
-                      )}
+                      ))}
+                      <div className="flex justify-between items-baseline pt-3">
+                        <p className="text-[0.6rem] tracking-[0.18em] uppercase" style={{ color: '#9a9590' }}>Total</p>
+                        <p className="text-[1.1rem] font-light" style={{ color: '#c9956c' }}>{formatPrice(order.prix_total)}</p>
+                      </div>
                     </div>
-                    {/* Product info */}
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[0.6rem] tracking-[0.2em] uppercase mb-0.5" style={{ color: '#c9956c' }}>
-                        {order.product?.collection ?? '—'}
-                      </p>
-                      <p className="text-[0.9rem] font-light mb-0.5" style={{ color: '#0a0a0a' }}>
-                        {order.product?.nom ?? '—'}
-                      </p>
-                      <p className="text-[0.7rem]" style={{ color: '#9a9590' }}>
-                        Réf. {order.product?.ref ?? '—'}
-                      </p>
+                  ) : (
+                    <div className="flex gap-5 items-start">
+                      <div className="flex-shrink-0 w-20 h-20 bg-off overflow-hidden">
+                        {order.product?.photo_principale ? (
+                          <Image
+                            src={order.product.photo_principale}
+                            alt={order.product.nom}
+                            width={80}
+                            height={80}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gl flex items-center justify-center">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ color: 'rgba(0,0,0,0.2)' }}><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[0.6rem] tracking-[0.2em] uppercase mb-0.5" style={{ color: '#c9956c' }}>
+                          {order.product?.collection ?? '—'}
+                        </p>
+                        <p className="text-[0.9rem] font-light mb-0.5" style={{ color: '#0a0a0a' }}>
+                          {order.product?.nom ?? '—'}
+                        </p>
+                        <p className="text-[0.7rem]" style={{ color: '#9a9590' }}>
+                          Réf. {order.product?.ref ?? '—'}
+                        </p>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        <p className="text-[1.1rem] font-light" style={{ color: '#c9956c' }}>
+                          {formatPrice(order.prix_total)}
+                        </p>
+                        <p className="text-[0.62rem] mt-0.5" style={{ color: '#9a9590' }}>TTC</p>
+                      </div>
                     </div>
-                    {/* Price */}
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-[1.1rem] font-light" style={{ color: '#c9956c' }}>
-                        {formatPrice(order.prix_total)}
-                      </p>
-                      <p className="text-[0.62rem] mt-0.5" style={{ color: '#9a9590' }}>TTC</p>
-                    </div>
-                  </div>
+                  )}
 
                   <div className="mt-5 pt-5 border-t grid grid-cols-2 gap-5 max-sm:grid-cols-1" style={{ borderColor: 'rgba(0,0,0,0.06)' }}>
                     <div>

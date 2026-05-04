@@ -146,45 +146,68 @@ export async function POST(req: NextRequest) {
       decremented.push({ id: item.product_id, oldStock: p.stock, qty: item.quantite })
     }
 
-    // 6. Construction des lignes avec les PRIX SERVEUR (jamais ceux du client)
+    // 6. Construction de la commande avec les PRIX SERVEUR (jamais ceux du client)
     const order_ref = generateOrderRef()
 
     const factuNote = facturation
       ? `FACTURATION: ${facturation.adresse}, ${facturation.ville}${facturation.code_postal ? ', ' + facturation.code_postal : ''}`
       : null
 
-    const rows = items.map((item) => {
+    const orderItems = items.map((item) => {
       const p = products.find(p => p.id === item.product_id)!
       return {
-        order_ref,
-        statut: 'en_attente_paiement' as const,
         product_id: item.product_id,
+        nom: p.nom,
+        ref: p.ref,
         quantite: item.quantite,
-        prix_total: (p.prix_reduc ?? p.prix) * item.quantite, // ← prix DB, pas client
-        client_prenom: client.prenom,
-        client_nom: client.nom,
-        client_email: client.email,
-        client_tel: client.tel,
-        livraison_adresse: livraison.adresse,
-        livraison_ville: livraison.ville,
-        livraison_code_postal: livraison.code_postal || null,
-        livraison_instructions: livraison.instructions || null,
-        paiement_methode,
-        notes_commercial: factuNote,
+        prix_unitaire: p.prix_reduc ?? p.prix,
+        prix_total: (p.prix_reduc ?? p.prix) * item.quantite,
       }
     })
 
-    const { data: inserted, error: insertErr } = await supabase
-      .from('orders')
-      .insert(rows)
-      .select()
-      .limit(1)
-      .single()
+    const totalPrix = orderItems.reduce((s, i) => s + i.prix_total, 0)
+    const totalQty  = orderItems.reduce((s, i) => s + i.quantite, 0)
 
-    if (insertErr) {
-      console.error('[commande/db]', insertErr.message)
+    const row = {
+      order_ref,
+      statut: 'en_attente_paiement' as const,
+      product_id: items[0].product_id, // premier article pour la jointure admin
+      quantite: totalQty,
+      prix_total: totalPrix,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      items: orderItems as any, // JSONB — détail de tous les articles
+      client_prenom: client.prenom,
+      client_nom: client.nom,
+      client_email: client.email,
+      client_tel: client.tel,
+      livraison_adresse: livraison.adresse,
+      livraison_ville: livraison.ville,
+      livraison_code_postal: livraison.code_postal || null,
+      livraison_instructions: livraison.instructions || null,
+      paiement_methode,
+      notes_commercial: factuNote,
+    }
+
+    const { data: insertedRows, error: insertErr } = await supabase
+      .from('orders')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .insert(row as any)
+      .select()
+
+    if (insertErr || !insertedRows?.length) {
+      // Rollback des décrémentations de stock
+      for (const d of decremented) {
+        await supabase
+          .from('products')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .update({ stock: d.oldStock } as any)
+          .eq('id', d.id)
+      }
+      console.error('[commande/db]', insertErr?.message)
       return NextResponse.json({ error: 'Erreur lors de la création de la commande' }, { status: 500 })
     }
+
+    const inserted = insertedRows[0]
 
     // 7. Notifications (non-bloquantes)
     const emailItems = items.map((item) => {

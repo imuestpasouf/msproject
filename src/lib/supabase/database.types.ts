@@ -41,6 +41,15 @@ export interface Product {
   created_at: string
 }
 
+export interface OrderItem {
+  product_id: string
+  nom: string
+  ref: string
+  quantite: number
+  prix_unitaire: number
+  prix_total: number
+}
+
 export interface Order {
   id: string
   order_ref: string
@@ -48,6 +57,7 @@ export interface Order {
   product_id: string | null
   quantite: number
   prix_total: number
+  items: OrderItem[]
   client_prenom: string
   client_nom: string
   client_email: string
