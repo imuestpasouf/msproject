@@ -51,7 +51,26 @@ export async function POST(_req: NextRequest, { params }: Ctx) {
   }
 
   // Restore stock (decremented at order placement)
-  if (order.product_id) {
+  // Use order.items (full per-product breakdown) to restore each product correctly.
+  // Fallback to legacy product_id/quantite for old single-product orders.
+  if (order.items?.length) {
+    for (const item of order.items) {
+      const { data: prod } = await supabase
+        .from('products')
+        .select('stock')
+        .eq('id', item.product_id)
+        .single()
+
+      if (prod) {
+        const prodRow = prod as Pick<Product, 'stock'>
+        await supabase
+          .from('products')
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .update({ stock: prodRow.stock + item.quantite } as any)
+          .eq('id', item.product_id)
+      }
+    }
+  } else if (order.product_id) {
     const { data: prod } = await supabase
       .from('products')
       .select('stock')
