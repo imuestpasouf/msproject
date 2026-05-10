@@ -39,6 +39,12 @@ function isVideoUrl(url: string): boolean {
   return /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url) || url.includes('/video/upload/')
 }
 
+function getVideoType(url: string): string {
+  if (/\.webm(\?.*)?$/i.test(url)) return 'video/webm'
+  if (/\.mov(\?.*)?$/i.test(url)) return 'video/quicktime'
+  return 'video/mp4'
+}
+
 function HeroSection({ image, base, t }: { image: string; base: string; t: Dict }) {
   const isVideo = image && isVideoUrl(image)
 
@@ -52,8 +58,9 @@ function HeroSection({ image, base, t }: { image: string; base: string; t: Dict 
             muted
             loop
             playsInline
+            src={image}
           >
-            <source src={image} />
+            <source src={image} type={getVideoType(image)} />
           </video>
           <div
             className="absolute inset-0"

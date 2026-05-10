@@ -42,6 +42,12 @@ function isVideoUrl(url: string): boolean {
   return /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url) || url.includes('/video/upload/')
 }
 
+function getVideoType(url: string): string {
+  if (/\.webm(\?.*)?$/i.test(url)) return 'video/webm'
+  if (/\.mov(\?.*)?$/i.test(url)) return 'video/quicktime'
+  return 'video/mp4'
+}
+
 function EditOverlay({
   imageKey,
   uploading,
@@ -128,8 +134,9 @@ function HeroSection({
             muted
             loop
             playsInline
+            src={bgUrl}
           >
-            <source src={bgUrl} />
+            <source src={bgUrl} type={getVideoType(bgUrl)} />
           </video>
           <div
             className="absolute inset-0"
