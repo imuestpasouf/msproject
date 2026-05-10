@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/service'
 import HomeCatalogueSection from '@/components/HomeCatalogueSection'
+import HeroVideo from '@/components/HeroVideo'
 import { getDictionary, isLocale } from '@/lib/i18n'
 import type { Locale, Dict } from '@/lib/i18n'
 import type { Product, SiteImage } from '@/lib/supabase/database.types'
@@ -39,11 +40,6 @@ function isVideoUrl(url: string): boolean {
   return /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url) || url.includes('/video/upload/')
 }
 
-function getVideoType(url: string): string {
-  if (/\.webm(\?.*)?$/i.test(url)) return 'video/webm'
-  if (/\.mov(\?.*)?$/i.test(url)) return 'video/quicktime'
-  return 'video/mp4'
-}
 
 function HeroSection({ image, base, t }: { image: string; base: string; t: Dict }) {
   const isVideo = image && isVideoUrl(image)
@@ -52,16 +48,7 @@ function HeroSection({ image, base, t }: { image: string; base: string; t: Dict 
     <section id="hero" className="relative h-screen flex items-end overflow-hidden bg-black">
       {isVideo ? (
         <>
-          <video
-            className="absolute inset-0 w-full h-full object-cover anim-hero-bg"
-            autoPlay
-            muted
-            loop
-            playsInline
-            src={image}
-          >
-            <source src={image} type={getVideoType(image)} />
-          </video>
+          <HeroVideo src={image} />
           <div
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%)' }}
