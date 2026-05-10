@@ -6,8 +6,10 @@ import { createServerClient } from '@supabase/ssr'
 import { v2 as cloudinary } from 'cloudinary'
 
 const VALID_KEYS = new Set(['hero', 'life1', 'life2', 'life3', 'life4'])
-const MAX_SIZE = 5 * 1024 * 1024
-const VALID_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
+const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
+const VIDEO_TYPES = new Set(['video/mp4', 'video/webm', 'video/quicktime'])
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024   // 5 MB
+const MAX_VIDEO_SIZE = 100 * 1024 * 1024 // 100 MB
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
@@ -40,24 +42,35 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Clé invalide' }, { status: 400 })
   }
 
-  if (!VALID_TYPES.has(file.type)) {
-    return Response.json({ error: 'Type non autorisé — JPG, PNG ou WebP uniquement' }, { status: 400 })
+  const isVideo = VIDEO_TYPES.has(file.type)
+  const isImage = IMAGE_TYPES.has(file.type)
+
+  if (!isImage && !isVideo) {
+    return Response.json({ error: 'Type non autorisé — JPG, PNG, WebP, MP4 ou WebM uniquement' }, { status: 400 })
   }
 
-  if (file.size > MAX_SIZE) {
-    return Response.json({ error: 'Fichier trop volumineux (max 5 MB)' }, { status: 400 })
+  if (isVideo && cle !== 'hero') {
+    return Response.json({ error: 'Vidéo uniquement pour la bannière principale' }, { status: 400 })
+  }
+
+  const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE
+  if (file.size > maxSize) {
+    return Response.json({ error: `Fichier trop volumineux (max ${isVideo ? '100' : '5'} MB)` }, { status: 400 })
   }
 
   const buffer = Buffer.from(await file.arrayBuffer())
-  const dataUri = `data:${file.type};base64,${buffer.toString('base64')}`
 
   let cloudResult: { secure_url: string }
   try {
-    cloudResult = await cloudinary.uploader.upload(dataUri, {
-      folder: 'd1milano/site',
-      public_id: `site_${cle}`,
-      overwrite: true,
-      resource_type: 'image',
+    cloudResult = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'd1milano/site', public_id: `site_${cle}`, overwrite: true, resource_type: 'auto' },
+        (error, result) => {
+          if (error || !result) reject(error ?? new Error('Upload failed'))
+          else resolve({ secure_url: result.secure_url })
+        }
+      )
+      stream.end(buffer)
     })
   } catch (err) {
     console.error('[upload-image] Cloudinary error:', err)

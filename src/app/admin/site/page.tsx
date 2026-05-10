@@ -38,6 +38,10 @@ function PencilIcon() {
 
 // ─── Edit overlay ─────────────────────────────────────────────────────────────
 
+function isVideoUrl(url: string): boolean {
+  return /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url) || url.includes('/video/upload/')
+}
+
 function EditOverlay({
   imageKey,
   uploading,
@@ -55,6 +59,10 @@ function EditOverlay({
     e.target.value = ''
   }
 
+  const accept = imageKey === 'hero'
+    ? 'image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime'
+    : 'image/jpeg,image/png,image/webp'
+
   return (
     <>
       <button
@@ -69,7 +77,7 @@ function EditOverlay({
             : 'opacity-0 group-hover:opacity-100 cursor-pointer pointer-events-none group-hover:pointer-events-auto',
         ].join(' ')}
         style={{ background: 'rgba(0,0,0,0.5)', border: 'none' }}
-        aria-label="Modifier l'image"
+        aria-label="Modifier l'image ou la vidéo"
       >
         {uploading ? (
           <Spinner />
@@ -77,7 +85,7 @@ function EditOverlay({
           <div className="flex flex-col items-center gap-2 text-white">
             <PencilIcon />
             <span className="text-[0.68rem] tracking-[0.2em] uppercase font-light">
-              Modifier
+              {imageKey === 'hero' ? 'Image / Vidéo' : 'Modifier'}
             </span>
           </div>
         )}
@@ -85,7 +93,7 @@ function EditOverlay({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp"
+        accept={accept}
         className="hidden"
         onChange={handleChange}
       />
@@ -105,19 +113,38 @@ function HeroSection({
   onUpload: (key: ImageKey, file: File) => void
 }) {
   const bgUrl = image ?? '/hero-placeholder.jpg'
+  const isVideo = image && isVideoUrl(image)
 
   return (
     <section
       id="hero"
       className="relative h-screen flex items-end overflow-hidden bg-black group"
     >
-      <div
-        className="absolute inset-0 anim-hero-bg"
-        style={{
-          background: `linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("${bgUrl}") center / cover no-repeat`,
-          backgroundColor: '#1a1a1a',
-        }}
-      />
+      {isVideo ? (
+        <>
+          <video
+            className="absolute inset-0 w-full h-full object-cover anim-hero-bg"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src={bgUrl} />
+          </video>
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%)' }}
+          />
+        </>
+      ) : (
+        <div
+          className="absolute inset-0 anim-hero-bg"
+          style={{
+            background: `linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("${bgUrl}") center / cover no-repeat`,
+            backgroundColor: '#1a1a1a',
+          }}
+        />
+      )}
 
       <EditOverlay imageKey="hero" uploading={uploading} onUpload={onUpload} />
 

@@ -35,16 +35,40 @@ async function getProducts(): Promise<Product[]> {
 
 // ─── Sections ─────────────────────────────────────────────────────────────────
 
+function isVideoUrl(url: string): boolean {
+  return /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url) || url.includes('/video/upload/')
+}
+
 function HeroSection({ image, base, t }: { image: string; base: string; t: Dict }) {
+  const isVideo = image && isVideoUrl(image)
+
   return (
     <section id="hero" className="relative h-screen flex items-end overflow-hidden bg-black">
-      <div
-        className="absolute inset-0 anim-hero-bg"
-        style={{
-          background: `linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("${image}") center / cover no-repeat`,
-          backgroundColor: '#1a1a1a',
-        }}
-      />
+      {isVideo ? (
+        <>
+          <video
+            className="absolute inset-0 w-full h-full object-cover anim-hero-bg"
+            autoPlay
+            muted
+            loop
+            playsInline
+          >
+            <source src={image} />
+          </video>
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%)' }}
+          />
+        </>
+      ) : (
+        <div
+          className="absolute inset-0 anim-hero-bg"
+          style={{
+            background: `linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.65) 100%), url("${image}") center / cover no-repeat`,
+            backgroundColor: '#1a1a1a',
+          }}
+        />
+      )}
       <div className="relative z-10 px-12 pb-16 max-w-[640px] anim-fade-up max-md:px-5 max-md:pb-12">
         <p className="text-[0.68rem] tracking-[0.3em] uppercase font-light mb-3.5" style={{ color: 'var(--color-rgl)' }}>
           {t.hero.tagline}
