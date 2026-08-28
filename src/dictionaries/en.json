@@ -9,6 +9,22 @@
     "menu_open": "Open menu",
     "menu_close": "Close menu"
   },
+  "cursor": {
+    "view": "View"
+  },
+  "preloader": {
+    "loading": "Loading"
+  },
+  "chapter_nav": {
+    "home": "Home",
+    "craft": "Craftsmanship",
+    "collection": "Collection",
+    "community": "Community",
+    "order": "Order"
+  },
+  "common": {
+    "missing_image": "Missing image"
+  },
   "lang_selector": {
     "fr": "Français",
     "en": "English",
@@ -31,6 +47,12 @@
     "Official warranty",
     "National shipping coming soon"
   ],
+  "stats": [
+    { "value": 40, "suffix": "mm", "line1": "Signature", "line2": "case size" },
+    { "value": 4, "suffix": "X", "line1": "Deferred", "line2": "payment (Alya)" },
+    { "value": 5, "suffix": " ATM", "line1": "Water", "line2": "resistance" },
+    { "value": 100, "suffix": "%", "line1": "Authenticity", "line2": "guaranteed" }
+  ],
   "collections_section": {
     "tagline": "Our lines",
     "title_plain": "The",
@@ -44,6 +66,26 @@
     "badge_phare": "Flagship",
     "badge_bestseller": "Bestseller",
     "badge_premium": "Premium"
+  },
+  "spotlight": {
+    "chapter": "Chapter I · Craftsmanship",
+    "panels": [
+      {
+        "title_plain": "Born in",
+        "title_em": "Milan.",
+        "text": "D1 Milano breaks with the classic round case — the octagon becomes a signature, recognizable at a glance."
+      },
+      {
+        "title_plain": "Japanese",
+        "title_em": "precision.",
+        "text": "A Miyota quartz movement, housed in a 316L stainless steel or soft-touch polycarbonate case, with scratch-resistant mineral glass."
+      },
+      {
+        "title_plain": "Built to",
+        "title_em": "last.",
+        "text": "5 ATM water resistance, careful finishing, Italian leather straps on the Ultra Thin line — made to accompany every moment."
+      }
+    ]
   },
   "lifestyle": {
     "tagline": "The community",

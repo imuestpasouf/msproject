@@ -5,7 +5,8 @@ import { verifySessionToken, COOKIE_NAME } from '@/lib/admin-session'
 import { createServerClient } from '@supabase/ssr'
 import { v2 as cloudinary } from 'cloudinary'
 
-const VALID_KEYS = new Set(['hero', 'life1', 'life2', 'life3', 'life4'])
+const VALID_KEYS = new Set(['hero', 'life1', 'life2', 'life3', 'life4', 'spotlight'])
+const VIDEO_ALLOWED_KEYS = new Set(['hero', 'spotlight'])
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 const VIDEO_TYPES = new Set(['video/mp4', 'video/webm', 'video/quicktime'])
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024   // 5 MB
@@ -49,8 +50,8 @@ export async function POST(request: NextRequest) {
     return Response.json({ error: 'Type non autorisé — JPG, PNG, WebP, MP4 ou WebM uniquement' }, { status: 400 })
   }
 
-  if (isVideo && cle !== 'hero') {
-    return Response.json({ error: 'Vidéo uniquement pour la bannière principale' }, { status: 400 })
+  if (isVideo && !VIDEO_ALLOWED_KEYS.has(cle)) {
+    return Response.json({ error: 'Vidéo non autorisée pour cet emplacement' }, { status: 400 })
   }
 
   const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_IMAGE_SIZE
@@ -60,16 +61,30 @@ export async function POST(request: NextRequest) {
 
   const buffer = Buffer.from(await file.arrayBuffer())
 
+  // Videos are always transcoded to H.264 MP4 on upload, regardless of the
+  // source container/codec (e.g. a ProRes .mov won't play in any browser —
+  // this guarantees a web-playable result without needing the source file
+  // pre-processed). quality:'auto' keeps the file small enough to fully
+  // buffer quickly, which matters for scroll-scrubbed playback.
+  const uploadOptions = isVideo
+    ? {
+        folder: 'd1milano/site',
+        public_id: `site_${cle}`,
+        overwrite: true,
+        resource_type: 'video' as const,
+        format: 'mp4',
+        video_codec: 'h264',
+        quality: 'auto',
+      }
+    : { folder: 'd1milano/site', public_id: `site_${cle}`, overwrite: true, resource_type: 'auto' as const }
+
   let cloudResult: { secure_url: string }
   try {
     cloudResult = await new Promise((resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        { folder: 'd1milano/site', public_id: `site_${cle}`, overwrite: true, resource_type: 'auto' },
-        (error, result) => {
-          if (error || !result) reject(error ?? new Error('Upload failed'))
-          else resolve({ secure_url: result.secure_url })
-        }
-      )
+      const stream = cloudinary.uploader.upload_stream(uploadOptions, (error, result) => {
+        if (error || !result) reject(error ?? new Error('Upload failed'))
+        else resolve({ secure_url: result.secure_url })
+      })
       stream.end(buffer)
     })
   } catch (err) {
@@ -97,6 +112,7 @@ export async function POST(request: NextRequest) {
   }
 
   revalidatePath('/')
+  revalidatePath('/D1-Milano/[lang]', 'page')
 
   return Response.json({ url })
 }

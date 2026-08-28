@@ -9,6 +9,22 @@
     "menu_open": "فتح القائمة",
     "menu_close": "إغلاق القائمة"
   },
+  "cursor": {
+    "view": "عرض"
+  },
+  "preloader": {
+    "loading": "جارٍ التحميل"
+  },
+  "chapter_nav": {
+    "home": "الرئيسية",
+    "craft": "الحرفية",
+    "collection": "المجموعة",
+    "community": "المجتمع",
+    "order": "اطلب الآن"
+  },
+  "common": {
+    "missing_image": "الصورة غير متوفرة"
+  },
   "lang_selector": {
     "fr": "Français",
     "en": "English",
@@ -31,6 +47,12 @@
     "ضمان رسمي",
     "توصيل وطني قريباً"
   ],
+  "stats": [
+    { "value": 40, "suffix": "مم", "line1": "قياس", "line2": "العلبة المميزة" },
+    { "value": 4, "suffix": "X", "line1": "دفع", "line2": "مؤجل عبر عالية" },
+    { "value": 5, "suffix": " ATM", "line1": "مقاومة", "line2": "للماء" },
+    { "value": 100, "suffix": "%", "line1": "أصالة", "line2": "مضمونة" }
+  ],
   "collections_section": {
     "tagline": "خطوطنا",
     "title_plain": "",
@@ -44,6 +66,26 @@
     "badge_phare": "رائد",
     "badge_bestseller": "الأكثر مبيعاً",
     "badge_premium": "بريميوم"
+  },
+  "spotlight": {
+    "chapter": "الفصل الأول · الحرفية",
+    "panels": [
+      {
+        "title_plain": "وُلدت في",
+        "title_em": "ميلانو.",
+        "text": "تكسر D1 Milano قاعدة العلبة المستديرة الكلاسيكية — يصبح الشكل الثماني توقيعها المميز الذي يُعرف من النظرة الأولى."
+      },
+      {
+        "title_plain": "دقة",
+        "title_em": "يابانية.",
+        "text": "حركة كوارتز من Miyota، داخل علبة من الفولاذ المقاوم للصدأ 316L أو بولي كربونات ناعمة الملمس، بزجاج معدني مقاوم للخدش."
+      },
+      {
+        "title_plain": "صُنعت",
+        "title_em": "لتدوم.",
+        "text": "مقاومة للماء حتى 5 ATM، تشطيبات دقيقة، وأساور من الجلد الإيطالي في تشكيلة Ultra Thin — لمرافقة كل لحظة."
+      }
+    ]
   },
   "lifestyle": {
     "tagline": "المجتمع",

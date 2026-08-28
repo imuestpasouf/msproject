@@ -7,7 +7,8 @@ import type { Product } from '@/lib/supabase/database.types'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type ImageKey = 'hero' | 'life1' | 'life2' | 'life3' | 'life4'
+type ImageKey = 'hero' | 'life1' | 'life2' | 'life3' | 'life4' | 'spotlight'
+const VIDEO_ALLOWED_KEYS: ImageKey[] = ['hero', 'spotlight']
 type SiteImages = Partial<Record<ImageKey, string>>
 
 // ─── Shared UI ────────────────────────────────────────────────────────────────
@@ -65,7 +66,7 @@ function EditOverlay({
     e.target.value = ''
   }
 
-  const accept = imageKey === 'hero'
+  const accept = VIDEO_ALLOWED_KEYS.includes(imageKey)
     ? 'image/jpeg,image/png,image/webp,video/mp4,video/webm,video/quicktime'
     : 'image/jpeg,image/png,image/webp'
 
@@ -91,7 +92,7 @@ function EditOverlay({
           <div className="flex flex-col items-center gap-2 text-white">
             <PencilIcon />
             <span className="text-[0.68rem] tracking-[0.2em] uppercase font-light">
-              {imageKey === 'hero' ? 'Image / Vidéo' : 'Modifier'}
+              {VIDEO_ALLOWED_KEYS.includes(imageKey) ? 'Image / Vidéo' : 'Modifier'}
             </span>
           </div>
         )}
@@ -239,6 +240,43 @@ function BrandStrip() {
         </div>
       ))}
     </div>
+  )
+}
+
+// ─── Section: Spotlight (Savoir-faire) ────────────────────────────────────────
+
+function SpotlightSection({
+  image,
+  uploading,
+  onUpload,
+}: {
+  image?: string
+  uploading: boolean
+  onUpload: (key: ImageKey, file: File) => void
+}) {
+  const isVideo = image && isVideoUrl(image)
+
+  return (
+    <section id="spotlight" className="relative h-[280px] bg-black group overflow-hidden">
+      {image ? (
+        isVideo ? (
+          <video className="absolute inset-0 w-full h-full object-cover" autoPlay muted loop playsInline src={image}>
+            <source src={image} type={getVideoType(image)} />
+          </video>
+        ) : (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={image} alt="" className="absolute inset-0 w-full h-full object-cover" />
+        )
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center text-[0.68rem] tracking-[0.15em] uppercase" style={{ color: 'rgba(255,255,255,0.3)' }}>
+          Aucun média
+        </div>
+      )}
+      <div className="absolute top-4 left-4 text-[0.6rem] tracking-[0.18em] uppercase px-2.5 py-1 text-white" style={{ background: 'rgba(0,0,0,0.5)' }}>
+        Chapitre · Savoir-faire
+      </div>
+      <EditOverlay imageKey="spotlight" uploading={uploading} onUpload={onUpload} />
+    </section>
   )
 }
 
@@ -596,6 +634,11 @@ export default function AdminSitePage() {
         onUpload={handleUpload}
       />
       <BrandStrip />
+      <SpotlightSection
+        image={images.spotlight}
+        uploading={uploading.has('spotlight')}
+        onUpload={handleUpload}
+      />
       <LifestyleSection
         images={images}
         uploading={uploading}

@@ -3,6 +3,9 @@ import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
 import MarqueeBanner from '@/components/ui/MarqueeBanner'
 import CartDrawer from '@/components/ui/CartDrawer'
+import SmoothScroll from '@/components/motion/SmoothScroll'
+import CustomCursor from '@/components/motion/CustomCursor'
+import Preloader from '@/components/motion/Preloader'
 import { LocaleProvider } from '@/context/LocaleContext'
 import { getDictionary, isLocale } from '@/lib/i18n'
 import type { Locale } from '@/lib/i18n'
@@ -26,12 +29,17 @@ export default async function LangLayout({
 
   return (
     <LocaleProvider lang={lang as Locale} dict={dict}>
+      <Preloader loadingLabel={dict.preloader.loading} />
+      <div className="grain-overlay" aria-hidden="true" />
+      <CustomCursor />
       <header className="fixed top-0 left-0 right-0 z-[100]">
         <Navbar />
         <MarqueeBanner text={dict.banner} />
       </header>
-      <main className="flex-1">{children}</main>
-      <Footer />
+      <SmoothScroll>
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </SmoothScroll>
       <CartDrawer />
 
       {/* Social floats */}

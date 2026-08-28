@@ -9,6 +9,22 @@
     "menu_open": "Ouvrir le menu",
     "menu_close": "Fermer le menu"
   },
+  "cursor": {
+    "view": "Voir"
+  },
+  "preloader": {
+    "loading": "Chargement"
+  },
+  "chapter_nav": {
+    "home": "Accueil",
+    "craft": "Savoir-faire",
+    "collection": "Collection",
+    "community": "Communauté",
+    "order": "Commander"
+  },
+  "common": {
+    "missing_image": "Image manquante"
+  },
   "lang_selector": {
     "fr": "Français",
     "en": "English",
@@ -30,6 +46,12 @@
     "Paiement à la livraison",
     "Livraison nationale"
   ],
+  "stats": [
+    { "value": 40, "suffix": "mm", "line1": "Boîtier", "line2": "signature" },
+    { "value": 4, "suffix": "X", "line1": "Paiement", "line2": "différé Alya" },
+    { "value": 5, "suffix": " ATM", "line1": "Résistance", "line2": "à l'eau" },
+    { "value": 100, "suffix": "%", "line1": "Authenticité", "line2": "garantie" }
+  ],
   "collections_section": {
     "tagline": "Nos lignes",
     "title_plain": "Les",
@@ -43,6 +65,26 @@
     "badge_phare": "Phare",
     "badge_bestseller": "Bestseller",
     "badge_premium": "Premium"
+  },
+  "spotlight": {
+    "chapter": "Chapitre I · Le savoir-faire",
+    "panels": [
+      {
+        "title_plain": "Née à",
+        "title_em": "Milan.",
+        "text": "D1 Milano rompt avec le boîtier rond classique — l'octogone devient signature, reconnaissable au premier regard."
+      },
+      {
+        "title_plain": "Précision",
+        "title_em": "japonaise.",
+        "text": "Mouvement quartz Miyota, logé dans un boîtier en acier inoxydable 316L ou en polycarbonate soft-touch, verre minéral traité anti-rayures."
+      },
+      {
+        "title_plain": "Faite pour",
+        "title_em": "durer.",
+        "text": "Étanchéité 5 ATM, finitions soignées, bracelets en cuir italien sur les lignes Ultra Thin — pensée pour accompagner chaque instant."
+      }
+    ]
   },
   "lifestyle": {
     "tagline": "La communauté",

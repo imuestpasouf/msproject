@@ -1,18 +1,25 @@
-import Link from 'next/link'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { createServiceClient } from '@/lib/supabase/service'
 import HomeCatalogueSection from '@/components/HomeCatalogueSection'
 import HeroVideo from '@/components/HeroVideo'
+import HeroIntro from '@/components/motion/HeroIntro'
+import Reveal from '@/components/motion/Reveal'
+import StatsStrip from '@/components/motion/StatsStrip'
+import ParallaxLayer from '@/components/motion/ParallaxLayer'
+import ProcessMotion from '@/components/motion/ProcessMotion'
+import SpotlightChapter from '@/components/SpotlightChapter'
+import ChapterNav from '@/components/motion/ChapterNav'
+import ImagePlaceholder from '@/components/ui/ImagePlaceholder'
 import { getDictionary, isLocale } from '@/lib/i18n'
 import type { Locale, Dict } from '@/lib/i18n'
 import type { Product, SiteImage } from '@/lib/supabase/database.types'
 
 const BRAND_BASE = '/D1-Milano'
 
-type SiteImageKey = 'hero' | 'life1' | 'life2' | 'life3' | 'life4'
+type SiteImageKey = 'hero' | 'life1' | 'life2' | 'life3' | 'life4' | 'spotlight'
 type SiteImages = Record<SiteImageKey, string>
-const PLACEHOLDERS: SiteImages = { hero: '', life1: '', life2: '', life3: '', life4: '' }
+const PLACEHOLDERS: SiteImages = { hero: '', life1: '', life2: '', life3: '', life4: '', spotlight: '' }
 
 async function getSiteImages(): Promise<SiteImages> {
   try {
@@ -63,26 +70,7 @@ function HeroSection({ image, base, t }: { image: string; base: string; t: Dict 
           }}
         />
       )}
-      <div className="relative z-10 px-12 pb-16 max-w-[640px] anim-fade-up max-md:px-5 max-md:pb-12">
-        <p className="text-[0.68rem] tracking-[0.3em] uppercase font-light mb-3.5" style={{ color: 'var(--color-rgl)' }}>
-          {t.hero.tagline}
-        </p>
-        <h1 className="font-display font-light leading-[1.05] text-white mb-[18px]" style={{ fontSize: 'clamp(2.8rem, 6vw, 5.2rem)' }}>
-          {t.hero.h1_1}<br />
-          <em className="italic" style={{ color: 'var(--color-rgl)' }}>{t.hero.h1_em}</em>
-        </h1>
-        <p className="text-[0.83rem] font-light tracking-[0.05em] leading-[1.7] mb-8 max-w-[400px]" style={{ color: 'rgba(255,255,255,0.7)' }}>
-          {t.hero.desc}
-        </p>
-        <div className="flex gap-3.5 items-center flex-wrap">
-          <Link href={`${base}#catalogue`} className="inline-block text-[0.72rem] tracking-[0.2em] uppercase font-normal text-white bg-black px-[30px] py-[14px] no-underline transition-colors duration-200 hover:bg-rg">
-            {t.hero.cta_discover}
-          </Link>
-          <Link href={`${base}#process`} className="text-[0.72rem] tracking-[0.2em] uppercase font-light text-white no-underline pb-[2px] transition-colors duration-200 hover:text-rgl" style={{ borderBottom: '1px solid rgba(255,255,255,0.4)' }}>
-            {t.hero.cta_how}
-          </Link>
-        </div>
-      </div>
+      <HeroIntro base={base} t={t} />
       <div className="absolute bottom-8 right-[52px] hidden md:flex flex-col items-center gap-2 anim-fade-up-late" style={{ color: 'rgba(255,255,255,0.4)' }}>
         <div className="w-[1px] h-12 anim-scroll-pulse" style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,0.5), transparent)' }} />
         <span className="text-[0.62rem] tracking-[0.25em] uppercase">{t.hero.scroll}</span>
@@ -93,14 +81,14 @@ function HeroSection({ image, base, t }: { image: string; base: string; t: Dict 
 
 function BrandStrip({ t }: { t: Dict }) {
   return (
-    <div className="bg-black px-12 py-[14px] flex gap-12 items-center overflow-x-auto no-scrollbar">
+    <Reveal y={0} duration={0.8} className="bg-black px-12 py-[14px] flex gap-12 items-center overflow-x-auto no-scrollbar">
       {t.brand_items.map((item) => (
         <div key={item} className="flex items-center gap-2.5 whitespace-nowrap text-[0.68rem] tracking-[0.18em] uppercase font-light" style={{ color: 'rgba(255,255,255,0.5)' }}>
           <div className="w-1 h-1 rounded-full flex-shrink-0 bg-rg" />
           {item}
         </div>
       ))}
-    </div>
+    </Reveal>
   )
 }
 
@@ -121,10 +109,22 @@ function LifestyleSection({ images, t }: { images: SiteImages; t: Dict }) {
         </a>
       </div>
       <div className="flex gap-[2px]">
-        {(['life1', 'life2', 'life3', 'life4'] as const).map((key) => (
-          <div key={key} className="relative flex-none bg-gd transition-all duration-500 hover:flex-[0_0_35%]" style={{ flex: '0 0 25%', height: '320px', filter: 'grayscale(15%)' }}>
-            {images[key] && <Image src={images[key]} alt="" fill className="object-cover" sizes="25vw" />}
-          </div>
+        {(['life1', 'life2', 'life3', 'life4'] as const).map((key, i) => (
+          <Reveal
+            key={key}
+            y={70}
+            delay={i * 0.15}
+            className="relative flex-none overflow-hidden bg-gd transition-all duration-500 hover:flex-[0_0_35%]"
+            style={{ flex: '0 0 25%', height: '320px', filter: 'grayscale(15%)' }}
+          >
+            {images[key] ? (
+              <ParallaxLayer speed={[0.85, 1.2, 0.9, 1.15][i]} className="absolute inset-0">
+                <Image src={images[key]} alt="" fill className="object-cover" sizes="25vw" />
+              </ParallaxLayer>
+            ) : (
+              <ImagePlaceholder label={t.common.missing_image} dark />
+            )}
+          </Reveal>
         ))}
       </div>
     </section>
@@ -141,17 +141,7 @@ function ProcessSection({ t }: { t: Dict }) {
         </h2>
         <p className="text-[0.83rem] text-gd font-light leading-[1.7] mt-2.5">{t.process.desc}</p>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-[2px]">
-        {t.process.steps.map((step, i) => (
-          <div key={i} className="relative bg-white px-7 py-9">
-            <div className="absolute top-[18px] right-[18px] w-[7px] h-[7px] rounded-full bg-rg" />
-            <div className="font-display text-[3.5rem] font-light leading-none mb-4 text-gl">0{i + 1}</div>
-            <div className="text-[1.5rem] mb-3.5">{['🔍', '📝', '📦'][i]}</div>
-            <div className="font-display text-[1.2rem] font-normal mb-2">{step.title}</div>
-            <p className="text-[0.78rem] font-light leading-[1.7] text-gd">{step.desc}</p>
-          </div>
-        ))}
-      </div>
+      <ProcessMotion steps={t.process.steps} />
     </section>
   )
 }
@@ -169,10 +159,21 @@ export default async function HomePage({ params }: { params: Promise<{ lang: str
     getDictionary(lang as Locale),
   ])
 
+  const chapters = [
+    { id: 'hero', label: dict.chapter_nav.home },
+    { id: 'savoir-faire', label: dict.chapter_nav.craft },
+    { id: 'catalogue', label: dict.chapter_nav.collection },
+    { id: 'lifestyle', label: dict.chapter_nav.community },
+    { id: 'process', label: dict.chapter_nav.order },
+  ]
+
   return (
     <>
+      <ChapterNav chapters={chapters} />
       <HeroSection image={siteImages.hero} base={base} t={dict} />
       <BrandStrip t={dict} />
+      <StatsStrip stats={dict.stats} />
+      <SpotlightChapter image={siteImages.spotlight || siteImages.life1} chapter={dict.spotlight} missingImageLabel={dict.common.missing_image} />
       <HomeCatalogueSection products={products} />
       <LifestyleSection images={siteImages} t={dict} />
       <ProcessSection t={dict} />

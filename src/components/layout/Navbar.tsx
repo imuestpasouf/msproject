@@ -1,13 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
+import clsx from 'clsx'
 import { useCart } from '@/context/CartContext'
 import { useLocale } from '@/context/LocaleContext'
+import { ScrollTrigger } from '@/lib/motion/gsap'
 import type { Locale } from '@/lib/i18n'
 
 const LOCALES: Locale[] = ['fr', 'en', 'ar']
+const SCROLL_THRESHOLD = 80
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -15,6 +18,20 @@ export default function Navbar() {
   const { lang, t, base } = useLocale()
   const pathname = usePathname()
   const router = useRouter()
+
+  const isHome = pathname === base || pathname === `${base}/`
+  const [scrolled, setScrolled] = useState(!isHome)
+  const solid = !isHome || scrolled
+
+  useEffect(() => {
+    if (!isHome) return
+    const trigger = ScrollTrigger.create({
+      trigger: document.body,
+      start: `top top-=${SCROLL_THRESHOLD}`,
+      onToggle: (self) => setScrolled(self.isActive),
+    })
+    return () => trigger.kill()
+  }, [isHome])
 
   function switchLang(newLang: Locale) {
     // Path: /D1-Milano/{lang}/{...rest} — lang is at index 2
@@ -24,29 +41,66 @@ export default function Navbar() {
     router.push(segments.join('/'))
   }
 
+  const easeTransition = { transitionTimingFunction: 'var(--ease-luxe)' }
+
   return (
     <>
       {/* Desktop nav */}
-      <nav className="flex items-center justify-between px-12 py-[18px] backdrop-blur-[12px] border-b border-gl max-md:px-5"
-           style={{ background: 'rgba(250,250,250,0.94)' }}>
+      <nav
+        className={clsx(
+          'flex items-center justify-between border-b max-md:px-5',
+          solid ? 'px-12 py-[18px] backdrop-blur-[12px] border-gl' : 'px-12 py-[30px] border-transparent',
+        )}
+        style={{
+          background: solid ? 'rgba(250,250,250,0.94)' : 'transparent',
+          transitionProperty: 'padding, background-color, border-color',
+          transitionDuration: '500ms',
+          ...easeTransition,
+        }}
+      >
         <Link href={base} className="no-underline flex flex-col leading-none">
-          <span className="font-body font-semibold text-[1.15rem] tracking-[0.38em] uppercase text-black">MS-STORE</span>
-          <span className="font-body font-light text-[0.52rem] tracking-[0.32em] uppercase text-gm mt-[3px]">D1 Milano</span>
+          <span
+            className={clsx('font-body font-semibold text-[1.15rem] tracking-[0.38em] uppercase transition-colors duration-500', solid ? 'text-black' : 'text-white')}
+            style={easeTransition}
+          >
+            MS-STORE
+          </span>
+          <span
+            className={clsx('font-body font-light text-[0.52rem] tracking-[0.32em] uppercase mt-[3px] transition-colors duration-500', solid ? 'text-gm' : 'text-white/60')}
+            style={easeTransition}
+          >
+            D1 Milano
+          </span>
         </Link>
 
         <ul className="hidden md:flex gap-8 list-none">
           <li>
-            <Link href={`${base}/#collections`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
+            <Link
+              href={`${base}/#collections`}
+              data-cursor={t.cursor.view}
+              className={clsx('font-light text-[0.75rem] tracking-[0.18em] uppercase no-underline transition-colors duration-500 hover:text-rg', solid ? 'text-gd' : 'text-white')}
+              style={easeTransition}
+            >
               {t.nav.collections}
             </Link>
           </li>
           <li>
-            <Link href={`${base}/catalogue`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
+            <Link
+              href={`${base}/catalogue`}
+              data-cursor={t.cursor.view}
+              className={clsx('font-light text-[0.75rem] tracking-[0.18em] uppercase no-underline transition-colors duration-500 hover:text-rg', solid ? 'text-gd' : 'text-white')}
+              style={easeTransition}
+            >
               {t.nav.catalogue}
             </Link>
           </li>
           <li>
-            <Link href={`${base}/#process`} className="font-light text-[0.75rem] tracking-[0.18em] uppercase text-gd no-underline hover:text-rg transition-colors duration-200">
+            <Link
+              href={`${base}/#process`}
+              data-cursor={t.cursor.view}
+              className={clsx('font-light text-[0.75rem] tracking-[0.18em] uppercase no-underline transition-colors duration-500 hover:text-rg', solid ? 'text-gd' : 'text-white')}
+              style={easeTransition}
+            >
               {t.nav.order}
             </Link>
           </li>
@@ -57,14 +111,17 @@ export default function Navbar() {
           <div className="flex items-center gap-1">
             {LOCALES.map((l, i) => (
               <span key={l} className="flex items-center">
-                {i > 0 && <span className="text-[0.55rem] text-gm mx-0.5">|</span>}
+                {i > 0 && <span className={clsx('text-[0.55rem] mx-0.5', solid ? 'text-gm' : 'text-white/40')}>|</span>}
                 <button
                   type="button"
                   onClick={() => switchLang(l)}
-                  className={[
-                    'text-[0.6rem] tracking-[0.12em] uppercase cursor-pointer bg-transparent border-none transition-colors duration-150 px-0.5',
-                    lang === l ? 'text-black font-medium' : 'text-gm hover:text-black',
-                  ].join(' ')}
+                  className={clsx(
+                    'text-[0.6rem] tracking-[0.12em] uppercase cursor-pointer bg-transparent border-none transition-colors duration-500 px-0.5',
+                    solid
+                      ? lang === l ? 'text-black font-medium' : 'text-gm hover:text-black'
+                      : lang === l ? 'text-white font-medium' : 'text-white/50 hover:text-white',
+                  )}
+                  style={easeTransition}
                 >
                   {l.toUpperCase()}
                 </button>
@@ -75,7 +132,8 @@ export default function Navbar() {
           <button
             type="button"
             onClick={openDrawer}
-            className="relative w-9 h-9 flex items-center justify-center cursor-pointer bg-transparent border-none text-gd hover:text-black transition-colors"
+            className={clsx('relative w-9 h-9 flex items-center justify-center cursor-pointer bg-transparent border-none transition-colors duration-500', solid ? 'text-gd hover:text-black' : 'text-white hover:text-rgl')}
+            style={easeTransition}
             aria-label={t.nav.cart_aria}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -89,8 +147,15 @@ export default function Navbar() {
               </span>
             )}
           </button>
-          <Link href={`${base}/catalogue`}
-            className="text-[0.7rem] tracking-[0.16em] uppercase font-normal text-white bg-black px-[22px] py-[10px] no-underline hover:bg-rg transition-colors duration-200">
+          <Link
+            href={`${base}/catalogue`}
+            data-cursor={t.cursor.view}
+            className={clsx(
+              'text-[0.7rem] tracking-[0.16em] uppercase font-normal no-underline px-[22px] py-[10px] transition-colors duration-500 hover:bg-rg',
+              solid ? 'text-white bg-black' : 'text-black bg-white',
+            )}
+            style={easeTransition}
+          >
             {t.nav.shop_watches}
           </Link>
         </div>
@@ -101,9 +166,9 @@ export default function Navbar() {
           onClick={() => setMobileOpen(true)}
           aria-label={t.nav.menu_open}
         >
-          <span className="block w-6 h-[1.5px] bg-black" />
-          <span className="block w-6 h-[1.5px] bg-black" />
-          <span className="block w-6 h-[1.5px] bg-black" />
+          <span className={clsx('block w-6 h-[1.5px] transition-colors duration-500', solid ? 'bg-black' : 'bg-white')} style={easeTransition} />
+          <span className={clsx('block w-6 h-[1.5px] transition-colors duration-500', solid ? 'bg-black' : 'bg-white')} style={easeTransition} />
+          <span className={clsx('block w-6 h-[1.5px] transition-colors duration-500', solid ? 'bg-black' : 'bg-white')} style={easeTransition} />
         </button>
       </nav>
 
