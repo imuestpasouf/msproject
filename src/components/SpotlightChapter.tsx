@@ -156,6 +156,7 @@ export default function SpotlightChapter({
 
     let locked = false
     let scrubbing = false
+    let hasScrubbed = false
     let targetTime = 0
     let displayedTime = 0
     let rafId = 0
@@ -240,8 +241,14 @@ export default function SpotlightChapter({
         }
         drawAt(displayedTime)
 
-        const atStart = targetTime <= 0 && displayedTime <= EPSILON
-        const atEnd = targetTime >= duration && displayedTime >= duration - EPSILON
+        // Only treat "at 0" as a rewind-to-start exit once the user has
+        // actually scrubbed at all — otherwise this is trivially true from
+        // the first frame (both start at 0), releasing the lock before any
+        // input can land. That was the real bug: not a platform quirk, a
+        // logic error that only *sometimes* got dodged by a lucky race
+        // between an incoming scroll event and the first tick.
+        const atStart = hasScrubbed && targetTime <= 0 && displayedTime <= EPSILON
+        const atEnd = hasScrubbed && targetTime >= duration && displayedTime >= duration - EPSILON
         if (atStart || atEnd) {
           release()
           return
@@ -253,6 +260,7 @@ export default function SpotlightChapter({
     function handleDelta(deltaSeconds: number) {
       const duration = durationRef.current
       if (!scrubbing || duration <= 0) return
+      hasScrubbed = true
       targetTime = Math.min(duration, Math.max(0, targetTime + deltaSeconds))
     }
 
@@ -275,6 +283,7 @@ export default function SpotlightChapter({
     function beginScrub() {
       targetTime = displayedTime
       scrubbing = true
+      hasScrubbed = false
       lastTs = 0
       rafId = requestAnimationFrame(tick)
     }
