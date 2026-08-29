@@ -4,13 +4,16 @@ import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { gsap, ScrollTrigger } from '@/lib/motion/gsap'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
+import { useIsDesktop } from '@/hooks/useIsDesktop'
 import ImagePlaceholder from '@/components/ui/ImagePlaceholder'
 import type { Dict } from '@/lib/i18n'
 
-const FRAME_COUNT = 100
-// How long the section takes to settle into a fully-framed position before
-// scroll starts driving the scrub, in ms.
-const SNAP_MS = 500
+const FRAME_COUNT = 50
+// Fallback cap on how long we wait for the settle-into-view scroll to finish
+// before pinning the body anyway, in ms — the real signal is the `scrollend`
+// event; this only covers the rare case it never fires (e.g. the section was
+// already perfectly framed, so nothing actually scrolled).
+const SNAP_MS = 700
 // Max "video-seconds" the displayed position can move per real second — a
 // pacing cap so a big scroll jump doesn't teleport, not a perf workaround
 // (canvas draws are free, so this can be generous).
@@ -65,6 +68,7 @@ export default function SpotlightChapter({
   missingImageLabel: string
 }) {
   const prefersReducedMotion = usePrefersReducedMotion()
+  const isDesktop = useIsDesktop()
   const active = !prefersReducedMotion
   const isVideo = image ? isVideoUrl(image) : false
   const posterUrl = isVideo && image ? cloudinaryFrameUrl(image, 0) : null
@@ -159,24 +163,59 @@ export default function SpotlightChapter({
     let touchStartY = 0
     let snapTimer: ReturnType<typeof setTimeout> | null = null
 
-    function lockScroll() {
+    let lockedScrollY = 0
+    let bodyPinned = false
+
+    function addInputBlockers() {
       window.addEventListener('wheel', onWheel, { passive: false })
       window.addEventListener('touchstart', onTouchStart, { passive: true })
       window.addEventListener('touchmove', onTouchMove, { passive: false })
       window.addEventListener('keydown', preventScrollKeys)
     }
 
-    function unlockScroll() {
+    function removeInputBlockers() {
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('touchstart', onTouchStart)
       window.removeEventListener('touchmove', onTouchMove)
       window.removeEventListener('keydown', preventScrollKeys)
     }
 
+    // On touch devices, preventDefault on touchmove can't stop *momentum*
+    // scrolling already in flight when the section was entered — iOS in
+    // particular keeps coasting with no further touch events to intercept.
+    // Pinning the body with position:fixed stops scrolling at the layout
+    // level instead, which momentum can't bypass. Must happen only *after*
+    // the scrollIntoView settle below — a fixed body can't be scrolled at
+    // all, native or programmatic. Desktop skips this: SmoothScroll's rig
+    // already manipulates document.body itself (real scrollable height, no
+    // fixed position), and desktop wheel input has no momentum problem.
+    function pinBody() {
+      if (isDesktop || bodyPinned) return
+      bodyPinned = true
+      lockedScrollY = window.scrollY
+      document.body.style.position = 'fixed'
+      document.body.style.top = `-${lockedScrollY}px`
+      document.body.style.left = '0'
+      document.body.style.right = '0'
+      document.body.style.width = '100%'
+    }
+
+    function unpinBody() {
+      if (!bodyPinned) return
+      bodyPinned = false
+      document.body.style.position = ''
+      document.body.style.top = ''
+      document.body.style.left = ''
+      document.body.style.right = ''
+      document.body.style.width = ''
+      window.scrollTo(0, lockedScrollY)
+    }
+
     function release() {
       locked = false
       scrubbing = false
-      unlockScroll()
+      removeInputBlockers()
+      unpinBody()
       if (snapTimer) {
         clearTimeout(snapTimer)
         snapTimer = null
@@ -234,11 +273,19 @@ export default function SpotlightChapter({
     }
 
     function beginScrub() {
-      snapTimer = null
       targetTime = displayedTime
       scrubbing = true
       lastTs = 0
       rafId = requestAnimationFrame(tick)
+    }
+
+    function finishSettle() {
+      if (snapTimer) {
+        clearTimeout(snapTimer)
+        snapTimer = null
+      }
+      window.removeEventListener('scrollend', finishSettle)
+      pinBody()
     }
 
     const observer = new IntersectionObserver(
@@ -246,17 +293,27 @@ export default function SpotlightChapter({
         const entry = entries[0]
         if (!entry || locked || entry.intersectionRatio < 0.6) return
         locked = true
-        lockScroll()
-        // Settle the section into a fully-framed position first. Using the
-        // native scrollIntoView (not a manually computed window.scrollTo)
+        addInputBlockers()
+        // Scrubbing starts immediately — don't make the user wait for the
+        // settle animation before their gesture does anything, especially on
+        // touch where a stalled response reads as "broken", not "loading".
+        beginScrub()
+        // Settle the section into a fully-framed position in parallel. Using
+        // the native scrollIntoView (not a manually computed window.scrollTo)
         // matters here: this page's smooth-scroll rig renders a *lerped*
         // visual position that lags behind raw window.scrollY, so hand-
         // computing a target by mixing the two gives the wrong answer on
         // desktop (mobile has no rig, which is why it happened to work
         // there). scrollIntoView operates on real layout/scroll state and
-        // stays correct regardless.
+        // stays correct regardless. The hard body-pin (pinBody, which is what
+        // actually stops iOS momentum) waits for `scrollend` — a fixed body
+        // can't be scrolled at all, so pinning too early would cut the settle
+        // animation short and reintroduce the off-center bug. SNAP_MS is only
+        // a fallback for when nothing actually scrolls (already framed), so
+        // no scrollend event would ever fire.
         section!.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        snapTimer = setTimeout(beginScrub, SNAP_MS)
+        window.addEventListener('scrollend', finishSettle, { once: true })
+        snapTimer = setTimeout(finishSettle, SNAP_MS)
       },
       { threshold: [0, 0.6, 1] },
     )
@@ -266,12 +323,14 @@ export default function SpotlightChapter({
 
     return () => {
       observer.disconnect()
-      unlockScroll()
+      removeInputBlockers()
+      unpinBody()
       window.removeEventListener('resize', resizeCanvas)
+      window.removeEventListener('scrollend', finishSettle)
       if (snapTimer) clearTimeout(snapTimer)
       cancelAnimationFrame(rafId)
     }
-  }, [active, isVideo])
+  }, [active, isVideo, isDesktop])
 
   // Static image: a gentle scroll-linked drift and panel crossfade over the
   // section's natural transit — no lock needed, opacity/transform tweens
