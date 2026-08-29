@@ -14,6 +14,11 @@ const FRAME_COUNT = 50
 // event; this only covers the rare case it never fires (e.g. the section was
 // already perfectly framed, so nothing actually scrolled).
 const SNAP_MS = 700
+// Absolute ceiling on how long the scroll lock can be held, no matter what.
+// If anything ever goes wrong upstream (metadata never loads, a frame never
+// becomes ready, any future bug), the user must never be physically unable
+// to scroll past this section.
+const MAX_LOCK_MS = 8000
 // Max "video-seconds" the displayed position can move per real second — a
 // pacing cap so a big scroll jump doesn't teleport, not a perf workaround
 // (canvas draws are free, so this can be generous).
@@ -91,6 +96,15 @@ export default function SpotlightChapter({
     const probe = document.createElement('video')
     probe.preload = 'metadata'
     probe.muted = true
+    // Must be attached to the document for metadata to load reliably —
+    // desktop browsers (including what Chrome DevTools' mobile emulation
+    // actually runs on) are lenient about detached video elements, but
+    // mobile WebKit (Safari and Chrome-on-iOS both use it) often won't fire
+    // loadedmetadata at all for an element that's never in the page. That
+    // silently broke everything downstream: drawing and the exit condition
+    // both gate on duration > 0.
+    probe.style.cssText = 'position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;'
+    document.body.appendChild(probe)
     probe.src = image
     probe.onloadedmetadata = () => {
       if (cancelled || !probe.duration) return
@@ -108,6 +122,8 @@ export default function SpotlightChapter({
     }
     return () => {
       cancelled = true
+      probe.onloadedmetadata = null
+      probe.remove()
     }
   }, [isVideo, image])
 
@@ -163,6 +179,7 @@ export default function SpotlightChapter({
     let lastTs = 0
     let touchStartY = 0
     let snapTimer: ReturnType<typeof setTimeout> | null = null
+    let safetyTimer: ReturnType<typeof setTimeout> | null = null
 
     let lockedScrollY = 0
     let bodyPinned = false
@@ -220,6 +237,10 @@ export default function SpotlightChapter({
       if (snapTimer) {
         clearTimeout(snapTimer)
         snapTimer = null
+      }
+      if (safetyTimer) {
+        clearTimeout(safetyTimer)
+        safetyTimer = null
       }
       cancelAnimationFrame(rafId)
     }
@@ -303,6 +324,7 @@ export default function SpotlightChapter({
         if (!entry || locked || entry.intersectionRatio < 0.6) return
         locked = true
         addInputBlockers()
+        safetyTimer = setTimeout(release, MAX_LOCK_MS)
         // Scrubbing starts immediately — don't make the user wait for the
         // settle animation before their gesture does anything, especially on
         // touch where a stalled response reads as "broken", not "loading".
@@ -337,6 +359,7 @@ export default function SpotlightChapter({
       window.removeEventListener('resize', resizeCanvas)
       window.removeEventListener('scrollend', finishSettle)
       if (snapTimer) clearTimeout(snapTimer)
+      if (safetyTimer) clearTimeout(safetyTimer)
       cancelAnimationFrame(rafId)
     }
   }, [active, isVideo, isDesktop])
