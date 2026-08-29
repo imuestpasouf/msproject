@@ -1,13 +1,23 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { gsap, ScrollTrigger } from '@/lib/motion/gsap'
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import ImagePlaceholder from '@/components/ui/ImagePlaceholder'
 import type { Dict } from '@/lib/i18n'
 
-const FRAME_COUNT = 60
+const FRAME_COUNT = 100
+// How long the section takes to settle into a fully-framed position before
+// scroll starts driving the scrub, in ms.
+const SNAP_MS = 500
+// Max "video-seconds" the displayed position can move per real second — a
+// pacing cap so a big scroll jump doesn't teleport, not a perf workaround
+// (canvas draws are free, so this can be generous).
+const MAX_SCRUB_RATE = 2.5
+const WHEEL_SECONDS_PER_PX = 0.006
+const TOUCH_SECONDS_PER_PX = 0.014
+const EPSILON = 0.02
 
 function isVideoUrl(url: string): boolean {
   return /\.(mp4|webm|mov|ogg)(\?.*)?$/i.test(url) || url.includes('/video/upload/')
@@ -39,6 +49,12 @@ function drawCover(
   ctx.drawImage(img, (canvasW - drawW) / 2, (canvasH - drawH) / 2, drawW, drawH)
 }
 
+const SCROLL_KEYS = new Set(['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'Home', 'End', ' '])
+
+function preventScrollKeys(e: KeyboardEvent) {
+  if (SCROLL_KEYS.has(e.key)) e.preventDefault()
+}
+
 export default function SpotlightChapter({
   image,
   chapter,
@@ -49,26 +65,22 @@ export default function SpotlightChapter({
   missingImageLabel: string
 }) {
   const prefersReducedMotion = usePrefersReducedMotion()
-  // Pinned/scrubbed on every screen size, not just desktop — the source
-  // asset is already portrait-shaped for mobile and light enough to scrub
-  // smoothly there. Only prefers-reduced-motion falls back to the static stack.
-  const pinnedActive = !prefersReducedMotion
+  const active = !prefersReducedMotion
   const isVideo = image ? isVideoUrl(image) : false
   const posterUrl = isVideo && image ? cloudinaryFrameUrl(image, 0) : null
 
   const sectionRef = useRef<HTMLDivElement>(null)
-  const pinRef = useRef<HTMLDivElement>(null)
   const wrapperRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const framesRef = useRef<HTMLImageElement[]>([])
+  const durationRef = useRef(0)
   const panelRefs = useRef<(HTMLDivElement | null)[]>([])
-  const barFillRef = useRef<HTMLDivElement>(null)
-  const [ready, setReady] = useState(false)
 
-  // Preload the still-frame sequence: canvas.drawImage() on an already-decoded
-  // bitmap is synchronous and near-instant, unlike <video>.currentTime seeking
-  // (which always carries real async latency in every browser — that's what
-  // was causing the stutter, no matter how the source video was encoded).
+  // Preload a still-frame sequence via Cloudinary's so_<seconds> transform.
+  // Scrubbing then draws already-decoded bitmaps to canvas (synchronous,
+  // zero seek latency) instead of seeking a <video> element — that's what
+  // was actually causing the jank/randomness, no matter how the currentTime
+  // updates were paced.
   useEffect(() => {
     if (!isVideo || !image) return
     let cancelled = false
@@ -78,6 +90,7 @@ export default function SpotlightChapter({
     probe.src = image
     probe.onloadedmetadata = () => {
       if (cancelled || !probe.duration) return
+      durationRef.current = probe.duration
       const frames: HTMLImageElement[] = []
       for (let i = 0; i < FRAME_COUNT; i++) {
         const t = (i / (FRAME_COUNT - 1)) * probe.duration
@@ -88,90 +101,221 @@ export default function SpotlightChapter({
         frames.push(frame)
       }
       framesRef.current = frames
-      setReady(true)
     }
     return () => {
       cancelled = true
     }
   }, [isVideo, image])
 
+  // Scroll is a scrub bar with a speed cap: scroll accumulates into a target
+  // position, and the displayed position eases toward it at a bounded rate.
   useEffect(() => {
-    if (!pinnedActive) return
+    if (!active || !isVideo) return
     const section = sectionRef.current
-    const pinTarget = pinRef.current
     const wrapper = wrapperRef.current
     const canvas = canvasRef.current
     const panels = panelRefs.current
-    const barFill = barFillRef.current
-    if (!section || !pinTarget || panels.length === 0) return
+    if (!section || !wrapper || !canvas || panels.length === 0) return
 
     panels.forEach((panel, i) => {
       if (panel) gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
     })
 
-    const ctx = canvas?.getContext('2d') ?? null
+    const ctx = canvas.getContext('2d')
 
     function resizeCanvas() {
-      if (!canvas || !wrapper) return
       const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvas.width = wrapper.clientWidth * dpr
-      canvas.height = wrapper.clientHeight * dpr
+      canvas!.width = wrapper!.clientWidth * dpr
+      canvas!.height = wrapper!.clientHeight * dpr
+    }
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+
+    function updatePanels(time: number, duration: number) {
+      const progress = time / duration
+      const idx = Math.min(panels.length - 1, Math.floor(progress * panels.length))
+      panels.forEach((panel, i) => {
+        if (panel) gsap.to(panel, { opacity: i === idx ? 1 : 0, duration: 0.3 })
+      })
     }
 
-    function drawFrame(idx: number) {
-      if (!ctx || !canvas) return
-      const frame = framesRef.current[idx]
+    function drawAt(time: number) {
+      const duration = durationRef.current
+      const frames = framesRef.current
+      if (!ctx || frames.length === 0 || duration <= 0) return
+      const idx = Math.min(frames.length - 1, Math.max(0, Math.round((time / duration) * (frames.length - 1))))
+      const frame = frames[idx]
       if (!frame || !frame.complete || frame.naturalWidth === 0) return
-      drawCover(ctx, frame, frame.naturalWidth, frame.naturalHeight, canvas.width, canvas.height)
+      drawCover(ctx, frame, frame.naturalWidth, frame.naturalHeight, canvas!.width, canvas!.height)
+      updatePanels(time, duration)
     }
 
-    if (isVideo) {
-      resizeCanvas()
-      drawFrame(0)
-      window.addEventListener('resize', resizeCanvas)
+    let locked = false
+    let scrubbing = false
+    let targetTime = 0
+    let displayedTime = 0
+    let rafId = 0
+    let lastTs = 0
+    let touchStartY = 0
+    let snapTimer: ReturnType<typeof setTimeout> | null = null
+
+    function lockScroll() {
+      window.addEventListener('wheel', onWheel, { passive: false })
+      window.addEventListener('touchstart', onTouchStart, { passive: true })
+      window.addEventListener('touchmove', onTouchMove, { passive: false })
+      window.addEventListener('keydown', preventScrollKeys)
     }
 
-    const pinTrigger = ScrollTrigger.create({
+    function unlockScroll() {
+      window.removeEventListener('wheel', onWheel)
+      window.removeEventListener('touchstart', onTouchStart)
+      window.removeEventListener('touchmove', onTouchMove)
+      window.removeEventListener('keydown', preventScrollKeys)
+    }
+
+    function release() {
+      locked = false
+      scrubbing = false
+      unlockScroll()
+      if (snapTimer) {
+        clearTimeout(snapTimer)
+        snapTimer = null
+      }
+      cancelAnimationFrame(rafId)
+    }
+
+    function tick(ts: number) {
+      if (!scrubbing) return
+      const duration = durationRef.current
+      const dt = lastTs ? Math.min(0.1, (ts - lastTs) / 1000) : 0
+      lastTs = ts
+
+      if (duration > 0) {
+        const diff = targetTime - displayedTime
+        if (Math.abs(diff) > EPSILON) {
+          const maxStep = MAX_SCRUB_RATE * dt
+          const step = Math.max(-maxStep, Math.min(maxStep, diff))
+          displayedTime = Math.min(duration, Math.max(0, displayedTime + step))
+        } else {
+          displayedTime = targetTime
+        }
+        drawAt(displayedTime)
+
+        const atStart = targetTime <= 0 && displayedTime <= EPSILON
+        const atEnd = targetTime >= duration && displayedTime >= duration - EPSILON
+        if (atStart || atEnd) {
+          release()
+          return
+        }
+      }
+      rafId = requestAnimationFrame(tick)
+    }
+
+    function handleDelta(deltaSeconds: number) {
+      const duration = durationRef.current
+      if (!scrubbing || duration <= 0) return
+      targetTime = Math.min(duration, Math.max(0, targetTime + deltaSeconds))
+    }
+
+    function onWheel(e: WheelEvent) {
+      e.preventDefault()
+      handleDelta(e.deltaY * WHEEL_SECONDS_PER_PX)
+    }
+
+    function onTouchStart(e: TouchEvent) {
+      touchStartY = e.touches[0]?.clientY ?? 0
+    }
+
+    function onTouchMove(e: TouchEvent) {
+      e.preventDefault()
+      const y = e.touches[0]?.clientY ?? touchStartY
+      handleDelta((touchStartY - y) * TOUCH_SECONDS_PER_PX)
+      touchStartY = y
+    }
+
+    function beginScrub() {
+      snapTimer = null
+      targetTime = displayedTime
+      scrubbing = true
+      lastTs = 0
+      rafId = requestAnimationFrame(tick)
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0]
+        if (!entry || locked || entry.intersectionRatio < 0.6) return
+        locked = true
+        lockScroll()
+        // Settle the section into a fully-framed position first. Using the
+        // native scrollIntoView (not a manually computed window.scrollTo)
+        // matters here: this page's smooth-scroll rig renders a *lerped*
+        // visual position that lags behind raw window.scrollY, so hand-
+        // computing a target by mixing the two gives the wrong answer on
+        // desktop (mobile has no rig, which is why it happened to work
+        // there). scrollIntoView operates on real layout/scroll state and
+        // stays correct regardless.
+        section!.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        snapTimer = setTimeout(beginScrub, SNAP_MS)
+      },
+      { threshold: [0, 0.6, 1] },
+    )
+    observer.observe(section)
+
+    drawAt(0)
+
+    return () => {
+      observer.disconnect()
+      unlockScroll()
+      window.removeEventListener('resize', resizeCanvas)
+      if (snapTimer) clearTimeout(snapTimer)
+      cancelAnimationFrame(rafId)
+    }
+  }, [active, isVideo])
+
+  // Static image: a gentle scroll-linked drift and panel crossfade over the
+  // section's natural transit — no lock needed, opacity/transform tweens
+  // have no seek-style cost regardless of scroll speed.
+  useEffect(() => {
+    if (!active || isVideo) return
+    const section = sectionRef.current
+    const wrapper = wrapperRef.current
+    const panels = panelRefs.current
+    if (!section || panels.length === 0) return
+
+    panels.forEach((panel, i) => {
+      if (panel) gsap.set(panel, { opacity: i === 0 ? 1 : 0 })
+    })
+
+    const crossfadeTrigger = ScrollTrigger.create({
       trigger: section,
-      start: 'top top',
-      end: '+=250%',
-      pin: pinTarget,
+      start: 'top bottom',
+      end: 'bottom top',
       scrub: 0.6,
       onUpdate: (self) => {
         const idx = Math.min(panels.length - 1, Math.floor(self.progress * panels.length))
         panels.forEach((panel, i) => {
           if (panel) gsap.to(panel, { opacity: i === idx ? 1 : 0, duration: 0.4 })
         })
-        if (barFill) gsap.set(barFill, { scaleX: self.progress })
-
-        if (isVideo && framesRef.current.length > 0) {
-          const frameIdx = Math.min(framesRef.current.length - 1, Math.round(self.progress * (framesRef.current.length - 1)))
-          drawFrame(frameIdx)
-        }
       },
     })
 
-    // Only static images get the parallax drift — the frame sequence itself
-    // already is the motion for video.
-    const wrapperTween = wrapper && !isVideo
+    const wrapperTween = wrapper
       ? gsap.to(wrapper, {
           yPercent: -15,
           ease: 'none',
-          scrollTrigger: { trigger: section, start: 'top top', end: '+=250%', scrub: 1 },
+          scrollTrigger: { trigger: section, start: 'top bottom', end: 'bottom top', scrub: 1 },
         })
       : null
 
     return () => {
-      pinTrigger.kill()
+      crossfadeTrigger.kill()
       wrapperTween?.scrollTrigger?.kill()
       wrapperTween?.kill()
-      window.removeEventListener('resize', resizeCanvas)
     }
-    // `ready` isn't read here, but re-running once frames are preloaded keeps
-    // drawFrame(0)'s initial paint in sync with newly-available bitmaps.
-  }, [pinnedActive, isVideo, ready])
+  }, [active, isVideo])
 
-  if (!pinnedActive) {
+  if (!active) {
     return (
       <section id="savoir-faire" className="bg-black">
         <div className="relative w-full h-[360px]">
@@ -204,48 +348,43 @@ export default function SpotlightChapter({
   }
 
   return (
-    <section id="savoir-faire" ref={sectionRef} className="relative bg-black overflow-hidden" style={{ height: '250vh' }}>
-      <div ref={pinRef} className="relative h-screen overflow-hidden">
-        {/* Media island — centered, inset from the edges rather than full-bleed */}
-        <div className="absolute inset-y-0 left-[8%] right-[8%] overflow-hidden max-md:left-0 max-md:right-0">
-          <div ref={wrapperRef} className="absolute inset-0" style={{ height: isVideo ? '100%' : '120%' }}>
-            {!image ? (
-              <ImagePlaceholder label={missingImageLabel} dark />
-            ) : isVideo ? (
-              <>
-                {/* Poster underneath so there's never a blank flash while frames preload */}
-                {posterUrl && <Image src={posterUrl} alt="" fill className="object-cover" sizes="(max-width: 900px) 100vw, 84vw" unoptimized />}
-                <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
-              </>
-            ) : (
-              <Image src={image} alt="" fill className="object-cover" sizes="(max-width: 900px) 100vw, 84vw" />
-            )}
-          </div>
+    <section id="savoir-faire" ref={sectionRef} className="relative bg-black h-screen overflow-hidden">
+      {/* Media island — centered, inset from the edges rather than full-bleed */}
+      <div className="absolute inset-y-0 left-[8%] right-[8%] overflow-hidden max-md:left-0 max-md:right-0">
+        <div ref={wrapperRef} className="absolute inset-0" style={{ height: isVideo ? '100%' : '120%' }}>
+          {!image ? (
+            <ImagePlaceholder label={missingImageLabel} dark />
+          ) : isVideo ? (
+            <>
+              {/* Poster underneath so there's never a blank flash while frames preload */}
+              {posterUrl && <Image src={posterUrl} alt="" fill className="object-cover" sizes="(max-width: 900px) 100vw, 84vw" unoptimized />}
+              <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+            </>
+          ) : (
+            <Image src={image} alt="" fill className="object-cover" sizes="(max-width: 900px) 100vw, 84vw" />
+          )}
+        </div>
 
-          {/* Legibility veil on the media itself — not a background behind the text */}
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 42%, transparent 68%)' }}
-          />
+        {/* Legibility veil on the media itself — not a background behind the text */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 42%, transparent 68%)' }}
+        />
 
-          {/* Text overlay, bottom-right, no panel */}
-          <div className="absolute bottom-0 right-0 z-10 w-[60%] max-w-[620px] px-10 pb-14 text-right max-md:w-full max-md:px-6 max-md:pb-10">
-            <span className="font-display italic text-[0.85rem] mb-6 block" style={{ color: 'var(--color-rgl)' }}>
-              {chapter.chapter}
-            </span>
-            <div className="relative h-[210px] max-md:h-[260px]">
-              {chapter.panels.map((panel, i) => (
-                <div key={i} ref={(el) => { panelRefs.current[i] = el }} className="absolute inset-0">
-                  <h3 className="font-display font-light mb-4 text-white" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
-                    {panel.title_plain} <em className="italic" style={{ color: 'var(--color-rgl)' }}>{panel.title_em}</em>
-                  </h3>
-                  <p className="text-[0.85rem] leading-[1.75] font-light" style={{ color: 'rgba(255,255,255,0.75)' }}>{panel.text}</p>
-                </div>
-              ))}
-            </div>
-            <div className="h-px w-full max-w-[320px] ml-auto mt-7 relative overflow-hidden" style={{ background: 'rgba(255,255,255,0.2)' }}>
-              <div ref={barFillRef} className="absolute inset-0 origin-left bg-rg" style={{ transform: 'scaleX(0)' }} />
-            </div>
+        {/* Text overlay, bottom-right, no panel */}
+        <div className="absolute bottom-0 right-0 z-10 w-[60%] max-w-[620px] px-10 pb-14 text-right max-md:w-full max-md:px-6 max-md:pb-10">
+          <span className="font-display italic text-[0.85rem] mb-6 block" style={{ color: 'var(--color-rgl)' }}>
+            {chapter.chapter}
+          </span>
+          <div className="relative h-[210px] max-md:h-[260px]">
+            {chapter.panels.map((panel, i) => (
+              <div key={i} ref={(el) => { panelRefs.current[i] = el }} className="absolute inset-0">
+                <h3 className="font-display font-light mb-4 text-white" style={{ fontSize: 'clamp(1.6rem, 3vw, 2.4rem)' }}>
+                  {panel.title_plain} <em className="italic" style={{ color: 'var(--color-rgl)' }}>{panel.title_em}</em>
+                </h3>
+                <p className="text-[0.85rem] leading-[1.75] font-light" style={{ color: 'rgba(255,255,255,0.75)' }}>{panel.text}</p>
+              </div>
+            ))}
           </div>
         </div>
       </div>
