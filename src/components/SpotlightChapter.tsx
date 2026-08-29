@@ -218,7 +218,12 @@ export default function SpotlightChapter({
       document.body.style.width = '100%'
     }
 
-    function unpinBody() {
+    // Restoring to exactly lockedScrollY (where the section is framed) would
+    // land the user right back at the trigger zone — the next scroll tick
+    // re-enters the 60% threshold instantly, re-locking forever. Instead,
+    // release scrolls them a full viewport *past* the section in whichever
+    // direction they were headed, same as if they'd scrolled straight through.
+    function unpinBody(exitDirection?: 'forward' | 'backward') {
       if (!bodyPinned) return
       bodyPinned = false
       document.body.style.position = ''
@@ -226,14 +231,20 @@ export default function SpotlightChapter({
       document.body.style.left = ''
       document.body.style.right = ''
       document.body.style.width = ''
-      window.scrollTo(0, lockedScrollY)
+      if (exitDirection === 'forward') {
+        window.scrollTo(0, lockedScrollY + window.innerHeight)
+      } else if (exitDirection === 'backward') {
+        window.scrollTo(0, Math.max(0, lockedScrollY - window.innerHeight))
+      } else {
+        window.scrollTo(0, lockedScrollY)
+      }
     }
 
-    function release() {
+    function release(exitDirection?: 'forward' | 'backward') {
       locked = false
       scrubbing = false
       removeInputBlockers()
-      unpinBody()
+      unpinBody(exitDirection)
       if (snapTimer) {
         clearTimeout(snapTimer)
         snapTimer = null
@@ -271,7 +282,7 @@ export default function SpotlightChapter({
         const atStart = hasScrubbed && targetTime <= 0 && displayedTime <= EPSILON
         const atEnd = hasScrubbed && targetTime >= duration && displayedTime >= duration - EPSILON
         if (atStart || atEnd) {
-          release()
+          release(atEnd ? 'forward' : 'backward')
           return
         }
       }
@@ -439,7 +450,7 @@ export default function SpotlightChapter({
   }
 
   return (
-    <section id="savoir-faire" ref={sectionRef} className="relative bg-black h-screen overflow-hidden">
+    <section id="savoir-faire" ref={sectionRef} className="relative bg-black h-[100dvh] overflow-hidden">
       {/* Media island — centered, inset from the edges rather than full-bleed */}
       <div className="absolute inset-y-0 left-[8%] right-[8%] overflow-hidden max-md:left-0 max-md:right-0">
         <div ref={wrapperRef} className="absolute inset-0" style={{ height: isVideo ? '100%' : '120%' }}>
